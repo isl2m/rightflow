@@ -1,0 +1,173 @@
+/* ==========================================================================
+   Antigravity Markdown Preview RTL & BiDi Stylesheet
+   Applies automatically to all Markdown files (.md, *.plan.md, *.task.md)
+   ========================================================================== */
+
+:root {
+  --rtl-font-family: 'Segoe UI', 'Cairo', 'Tajawal', 'Almarai', Tahoma, -apple-system, sans-serif;
+  --rtl-code-font: var(--vscode-editor-font-family, Consolas, 'Courier New', monospace);
+}
+
+/* RTL Block Class (applied per-paragraph/block by markdown-rtl.js) */
+.rtl-block,
+[dir="rtl"] {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+  font-family: var(--rtl-font-family) !important;
+  line-height: 1.8 !important;
+}
+
+/* Force LTR Blocks */
+.ltr-block,
+[dir="ltr"] {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Inline code inside RTL text MUST stay LTR and isolate */
+.rtl-block code,
+[dir="rtl"] code,
+.rtl-block .code-inline {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline-block !important;
+  font-family: var(--rtl-code-font) !important;
+  padding: 0.15em 0.4em !important;
+  margin: 0 0.25em !important;
+  vertical-align: baseline !important;
+  text-align: left !important;
+  font-size: 0.9em !important;
+}
+
+/* Preformatted code blocks MUST STAY LTR */
+pre,
+pre code,
+.code-block {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  text-align: left !important;
+  font-family: var(--rtl-code-font) !important;
+  line-height: 1.5 !important;
+}
+
+/* Blockquotes in RTL */
+.rtl-block blockquote,
+[dir="rtl"] blockquote,
+blockquote.rtl-block {
+  direction: rtl !important;
+  text-align: right !important;
+  border-left: none !important;
+  border-right: 4px solid var(--vscode-textBlockQuote-border, #3b82f6) !important;
+  padding-left: 0.5rem !important;
+  padding-right: 1.25rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Lists in RTL */
+.rtl-block ul,
+.rtl-block ol,
+[dir="rtl"] ul,
+[dir="rtl"] ol,
+ul.rtl-block,
+ol.rtl-block {
+  direction: rtl !important;
+  text-align: right !important;
+  padding-right: 2rem !important;
+  padding-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.rtl-block li,
+[dir="rtl"] li {
+  direction: rtl !important;
+  text-align: right !important;
+  margin-bottom: 0.35rem !important;
+}
+
+/* Checkbox task lists (- [ ] / - [x]) */
+.rtl-block input[type="checkbox"],
+[dir="rtl"] input[type="checkbox"] {
+  margin-right: 0 !important;
+  margin-left: 0.6rem !important;
+  transform: translateY(1px) !important;
+}
+
+/* Tables in RTL */
+.rtl-block table,
+[dir="rtl"] table,
+table.rtl-block {
+  direction: rtl !important;
+  text-align: right !important;
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+.rtl-block th,
+.rtl-block td,
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+/* GitHub & Antigravity Markdown Alerts / Callouts */
+.rtl-block .markdown-alert,
+[dir="rtl"] .markdown-alert {
+  direction: rtl !important;
+  text-align: right !important;
+  border-left: none !important;
+  border-right: 4px solid currentColor !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.rtl-block .markdown-alert-title,
+[dir="rtl"] .markdown-alert-title {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+/* Floating Toolbar for Markdown Preview */
+#markdown-rtl-floating-toolbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-editor-foreground, #cccccc);
+  border: 1px solid var(--vscode-widget-border, rgba(128, 128, 128, 0.3));
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: var(--vscode-font-family, sans-serif);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0.4;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  user-select: none;
+  cursor: pointer;
+}
+
+#markdown-rtl-floating-toolbar:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+#markdown-rtl-floating-toolbar.active {
+  color: #38bdf8;
+  border-color: #38bdf8;
+  opacity: 0.9;
+}
+
+#markdown-rtl-floating-toolbar .indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}

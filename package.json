@@ -1,0 +1,156 @@
+{
+  "name": "rightflow",
+  "displayName": "RightFlow - RTL & Arabic Engine for Antigravity",
+  "description": "Seamless Arabic, Hebrew & Persian RTL and BiDi engine for Antigravity IDE: Chat, Prompt Input, Plan files (*.plan.md), Work/Tasks, Markdown Previews, and Monaco Editor.",
+  "version": "1.0.4",
+  "publisher": "islam-fathy",
+  "author": "Islam Fathy",
+  "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isl2m/rightflow"
+  },
+  "homepage": "https://github.com/isl2m/rightflow#readme",
+  "bugs": {
+    "url": "https://github.com/isl2m/rightflow/issues"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "Formatters",
+    "Themes"
+  ],
+  "keywords": [
+    "arabic",
+    "rtl",
+    "bidi",
+    "bidirectional",
+    "antigravity",
+    "antigravity-chat",
+    "rightflow",
+    "markdown",
+    "plan",
+    "task",
+    "hebrew",
+    "farsi",
+    "persian"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rightflow.activate",
+        "title": "RightFlow: Activate RTL Suite",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.deactivate",
+        "title": "RightFlow: Deactivate RTL Suite",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.toggleMenu",
+        "title": "RightFlow: Open Control Menu",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.toggleEditorRtl",
+        "title": "RightFlow: Toggle Editor RTL Direction",
+        "icon": "$(arrow-swap)",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.toggleChatRtl",
+        "title": "RightFlow: Toggle Chat RTL Mode",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.setupFonts",
+        "title": "RightFlow: Setup Recommended Arabic Fonts in Editor",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.status",
+        "title": "RightFlow: Check RTL Status & Diagnostics",
+        "category": "RightFlow"
+      },
+      {
+        "command": "rightflow.restart",
+        "title": "RightFlow: Restart RTL Injection",
+        "category": "RightFlow"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "rightflow.toggleMenu",
+        "key": "ctrl+alt+shift+r",
+        "mac": "cmd+alt+shift+r"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "rightflow.toggleEditorRtl",
+          "group": "navigation",
+          "when": "resourceExtname == .md || resourceExtname == .plan.md || editorTextFocus"
+        }
+      ]
+    },
+    "markdown.previewStyles": [
+      "./media/markdown-rtl.css"
+    ],
+    "markdown.previewScripts": [
+      "./media/markdown-rtl.js"
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "RightFlow Settings",
+      "properties": {
+        "rightflow.editorRtlMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Manual toggle for RTL mode in the Monaco code editor."
+        },
+        "rightflow.autoDetect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically detect Arabic/RTL text and apply RTL direction only to RTL paragraphs."
+        },
+        "rightflow.enhanceFonts": {
+          "type": "boolean",
+          "default": true,
+          "description": "Apply high-readability Arabic typography stack (Segoe UI, Cairo, Tahoma) to Chat, Plans, and Previews."
+        },
+        "rightflow.supportPromptInput": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable dynamic RTL alignment when typing in the prompt input / chat textarea."
+        },
+        "rightflow.lineHeightRatio": {
+          "type": "number",
+          "default": 1.75,
+          "description": "Line height ratio for Arabic text blocks to prevent diacritic clipping."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "compile": "node esbuild.mjs",
+    "package": "npx @vscode/vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0"
+  }
+}
