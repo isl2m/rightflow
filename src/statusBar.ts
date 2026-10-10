@@ -42,6 +42,7 @@ export async function updateStatusBarText() {
 }
 
 export async function showRtlControlMenu() {
+  const ideName = vscode.env.appName || 'IDE';
   const installations = await findIdeInstallations();
   const isInstalled =
     installations.length > 0 &&
@@ -54,8 +55,8 @@ export async function showRtlControlMenu() {
       label: isInstalled ? '$(check) RTL Suite: Active' : '$(play) Activate RTL Suite',
       description: isInstalled
         ? 'Workbench, Chat, Plans & Artifacts are patched'
-        : 'Patch Antigravity workbench for Chat, Plans & Work',
-      detail: isInstalled ? 'Click to re-inject/update assets' : 'Requires IDE restart after first patch',
+        : `Patch ${ideName} workbench for Chat, Plans & Work`,
+      detail: isInstalled ? 'Click to re-inject/update assets' : 'Requires IDE reload after first patch',
     },
     {
       label: '$(edit) Toggle Editor RTL Direction',
@@ -81,12 +82,12 @@ export async function showRtlControlMenu() {
   }
 
   items.push({
-    label: '$(sync) Reload Antigravity Window',
+    label: `$(sync) Reload ${ideName} Window`,
     description: 'Instantly reloads window to apply changes',
   });
 
   const selected = await vscode.window.showQuickPick(items, {
-    placeHolder: 'RightFlow - Control Center',
+    placeHolder: 'RightFlow - Universal RTL Control Center',
   });
 
   if (!selected) return;
@@ -101,7 +102,7 @@ export async function showRtlControlMenu() {
     await vscode.commands.executeCommand('rightflow.status');
   } else if (selected.label.includes('Deactivate')) {
     await vscode.commands.executeCommand('rightflow.deactivate');
-  } else if (selected.label.includes('Reload Antigravity')) {
+  } else if (selected.label.includes('Reload')) {
     await vscode.commands.executeCommand('workbench.action.reloadWindow');
   }
 }

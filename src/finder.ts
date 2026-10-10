@@ -12,7 +12,7 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
-const CANDIDATE_SUBDIRS = ['electron-browser', 'electron-sandbox'];
+const CANDIDATE_SUBDIRS = ['electron-sandbox', 'electron-browser'];
 
 export async function findIdeInstallations(): Promise<IdeInstallation[]> {
   const appRoot = vscode.env.appRoot;
@@ -22,10 +22,6 @@ export async function findIdeInstallations(): Promise<IdeInstallation[]> {
   }
 
   const workbenchDir = path.join(appRoot, 'out', 'vs', 'workbench');
-  if (!(await fileExists(workbenchDir))) {
-    return [];
-  }
-
   const results: IdeInstallation[] = [];
 
   for (const subdir of CANDIDATE_SUBDIRS) {
@@ -53,7 +49,7 @@ export async function findIdeInstallations(): Promise<IdeInstallation[]> {
       const hasSecondary = await fileExists(secondaryHtmlPath);
 
       results.push({
-        ideName: vscode.env.appName || 'Antigravity IDE',
+        ideName: vscode.env.appName || 'AI Code IDE',
         workbenchHtmlPath,
         workbenchDir,
         productJsonPath,

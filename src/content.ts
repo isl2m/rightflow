@@ -4,40 +4,59 @@ export const INJECTED_JS_FILENAME = 'rightflow.js';
 export const INJECTED_CSS = `/* === RIGHTFLOW-START === */
 
 /* ==========================================================================
-   RightFlow - High Performance RTL & Arabic Engine for Antigravity IDE
-   Supports: Chat, Plans (*.plan.md), Work/Tasks, Artifacts, Markdown & Monaco Editor
+   RightFlow - Universal High Performance RTL & Arabic Engine for AI IDEs
+   Supports: Antigravity IDE, Cursor, GitHub Copilot (VS Code), Windsurf (Cascade),
+             Plans (*.plan.md), Work/Tasks, Artifacts, Markdown Previews & Monaco
    ========================================================================== */
 
-/* Typography & Direction for RTL Elements in Chat, Plans & Artifacts */
+/* Universal RTL Class - Typography, Direction & BiDi Isolation */
+.rightflow-is-rtl,
 .antigravity-is-rtl,
 [data-rtl="true"] {
     direction: rtl !important;
     text-align: right !important;
-    unicode-bidi: plaintext !important;
+    unicode-bidi: isolate !important;
     font-family: 'Segoe UI', 'Cairo', 'Tajawal', 'Almarai', Tahoma, -apple-system, sans-serif !important;
     line-height: 1.75 !important;
 }
 
-/* Mixed BiDi: Inline Code inside RTL sentences MUST isolate and stay LTR */
+/* BiDi Isolation for Inline Spans, Links & Formatting inside RTL sentences */
+.rightflow-is-rtl span,
+.antigravity-is-rtl span,
+.rightflow-is-rtl a,
+.antigravity-is-rtl a,
+.rightflow-is-rtl em,
+.antigravity-is-rtl em,
+.rightflow-is-rtl strong,
+.antigravity-is-rtl strong,
+.rightflow-is-rtl b,
+.antigravity-is-rtl b {
+    unicode-bidi: isolate !important;
+}
+
+/* Mixed BiDi: Inline Code inside RTL sentences MUST isolate and stay strictly LTR */
+.rightflow-is-rtl code,
 .antigravity-is-rtl code,
 [data-rtl="true"] code,
-.antigravity-is-rtl .code-inline,
-[data-rtl="true"] .code-inline {
+.rightflow-is-rtl .code-inline,
+.antigravity-is-rtl .code-inline {
     direction: ltr !important;
     unicode-bidi: isolate !important;
     display: inline-block !important;
     font-family: var(--vscode-editor-font-family, Consolas, 'Courier New', monospace) !important;
-    padding: 0.15em 0.4em !important;
+    padding: 0.15em 0.45em !important;
     margin: 0 0.25em !important;
     vertical-align: baseline !important;
     text-align: left !important;
 }
 
 /* Code Blocks & Interactive Results MUST STAY STRICTLY LTR */
+.rightflow-is-rtl pre,
 .antigravity-is-rtl pre,
+.rightflow-is-rtl pre code,
 .antigravity-is-rtl pre code,
-.antigravity-is-rtl .interactive-result-code-block,
-.antigravity-is-rtl .code-block-container,
+.rightflow-is-rtl .interactive-result-code-block,
+.rightflow-is-rtl .code-block-container,
 [data-rtl="true"] pre,
 [data-rtl="true"] pre code {
     direction: ltr !important;
@@ -48,10 +67,15 @@ export const INJECTED_CSS = `/* === RIGHTFLOW-START === */
 }
 
 /* Code Block Header, Action buttons, Copy button STAY LTR */
+.rightflow-is-rtl .code-block-header,
 .antigravity-is-rtl .code-block-header,
+.rightflow-is-rtl .code-block,
 .antigravity-is-rtl .code-block,
+.rightflow-is-rtl .code-actions,
 .antigravity-is-rtl .code-actions,
+.rightflow-is-rtl .code-actions-container,
 .antigravity-is-rtl .code-actions-container,
+.rightflow-is-rtl button[data-tooltip-id*="copy"],
 .antigravity-is-rtl button[data-tooltip-id*="copy"],
 [data-rtl="true"] .code-block-header,
 [data-rtl="true"] .code-block,
@@ -62,8 +86,10 @@ export const INJECTED_CSS = `/* === RIGHTFLOW-START === */
 }
 
 /* Blockquotes in RTL: Border flips to the RIGHT side */
+.rightflow-is-rtl blockquote,
 .antigravity-is-rtl blockquote,
 [data-rtl="true"] blockquote,
+blockquote.rightflow-is-rtl,
 blockquote.antigravity-is-rtl {
     direction: rtl !important;
     text-align: right !important;
@@ -76,7 +102,9 @@ blockquote.antigravity-is-rtl {
 }
 
 /* Lists in RTL: Fix bullets and numbering alignment */
+.rightflow-is-rtl ul,
 .antigravity-is-rtl ul,
+.rightflow-is-rtl ol,
 .antigravity-is-rtl ol,
 [data-rtl="true"] ul,
 [data-rtl="true"] ol {
@@ -88,21 +116,26 @@ blockquote.antigravity-is-rtl {
     list-style-position: outside !important;
 }
 
+.rightflow-is-rtl li,
 .antigravity-is-rtl li,
 [data-rtl="true"] li {
     direction: rtl !important;
     text-align: right !important;
 }
 
+.rightflow-is-rtl ol li::marker,
 .antigravity-is-rtl ol li::marker,
+.rightflow-is-rtl ul li::marker,
 .antigravity-is-rtl ul li::marker {
     unicode-bidi: isolate !important;
 }
 
 /* Checkbox lists / Task lists in Plan & Work */
+.rightflow-is-rtl li input[type="checkbox"],
 .antigravity-is-rtl li input[type="checkbox"],
 [data-rtl="true"] li input[type="checkbox"],
 .antigravity-task-item input[type="checkbox"],
+.rightflow-is-rtl .task-list-item-checkbox,
 .antigravity-is-rtl .task-list-item-checkbox {
     margin-right: 0 !important;
     margin-left: 0.65rem !important;
@@ -111,6 +144,12 @@ blockquote.antigravity-is-rtl {
 }
 
 /* Headings in RTL */
+.rightflow-is-rtl h1,
+.rightflow-is-rtl h2,
+.rightflow-is-rtl h3,
+.rightflow-is-rtl h4,
+.rightflow-is-rtl h5,
+.rightflow-is-rtl h6,
 .antigravity-is-rtl h1,
 .antigravity-is-rtl h2,
 .antigravity-is-rtl h3,
@@ -127,6 +166,7 @@ blockquote.antigravity-is-rtl {
 }
 
 /* Tables in RTL */
+.rightflow-is-rtl table,
 .antigravity-is-rtl table,
 [data-rtl="true"] table {
     direction: rtl !important;
@@ -134,6 +174,8 @@ blockquote.antigravity-is-rtl {
     border-collapse: collapse !important;
 }
 
+.rightflow-is-rtl th,
+.rightflow-is-rtl td,
 .antigravity-is-rtl th,
 .antigravity-is-rtl td,
 [data-rtl="true"] th,
@@ -142,8 +184,11 @@ blockquote.antigravity-is-rtl {
 }
 
 /* Callout Alerts (GitHub / Markdown / Plan Alerts) */
+.rightflow-is-rtl .alert,
 .antigravity-is-rtl .alert,
+.rightflow-is-rtl [data-alert],
 .antigravity-is-rtl [data-alert],
+.rightflow-is-rtl .markdown-alert,
 .antigravity-is-rtl .markdown-alert {
     direction: rtl !important;
     text-align: right !important;
@@ -154,6 +199,10 @@ blockquote.antigravity-is-rtl {
 }
 
 /* Chat Prompt Input Box - Dynamic RTL Alignment */
+textarea.rightflow-input-rtl,
+input.rightflow-input-rtl,
+div[contenteditable="true"].rightflow-input-rtl,
+[data-lexical-editor="true"].rightflow-input-rtl,
 textarea.antigravity-input-rtl,
 input.antigravity-input-rtl,
 div[contenteditable="true"].antigravity-input-rtl {
@@ -164,13 +213,7 @@ div[contenteditable="true"].antigravity-input-rtl {
     caret-color: var(--vscode-editorCursor-foreground, currentColor) !important;
 }
 
-/* ==========================================================================
-   Monaco Editor: Manual RTL Mode
-   IMPORTANT: NEVER activates automatically. Activates ONLY when the user clicks
-   the RTL button in the editor toolbar or presses Ctrl+Alt+R.
-   ========================================================================== */
-
-/* Full RTL Mode for Monaco Editor (Active ONLY when toggled ON) */
+/* Monaco Editor: Manual RTL Mode */
 body.rightflow-force-editor-rtl .monaco-editor .view-lines,
 body.antigravity-force-editor-rtl .monaco-editor .view-lines,
 .monaco-editor.rightflow-editor-rtl .view-lines,
@@ -190,7 +233,6 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line,
     box-sizing: border-box !important;
     padding-right: 10px !important;
     padding-left: 10px !important;
-    /* Precise system font metrics that match Monaco's line-height grid without vertical clipping */
     font-family: var(--vscode-editor-font-family, Consolas), 'Segoe UI', Tahoma, -apple-system, sans-serif !important;
 }
 
@@ -201,7 +243,6 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span,
     unicode-bidi: plaintext !important;
 }
 
-/* Inline code and markdown syntax inside RTL lines */
 body.rightflow-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk-code,
 body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk-code,
 .monaco-editor.rightflow-editor-rtl .view-lines .view-line span.mtk-code,
@@ -210,11 +251,7 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
     unicode-bidi: isolate !important;
 }
 
-/* ==========================================================================
-   Header Buttons: Sleek Native Icon Buttons
-   ========================================================================== */
-
-/* Chat Header Button: Matches Antigravity (+, history, close) icons perfectly */
+/* Header Buttons: Sleek Native Icon Buttons */
 #rightflow-toggle-btn,
 #antigravity-rtl-toggle-btn {
     width: 26px !important;
@@ -247,7 +284,7 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
 #rightflow-toggle-btn.antigravity-rtl-active,
 #antigravity-rtl-toggle-btn.antigravity-rtl-active {
     opacity: 1 !important;
-    color: #38bdf8 !important; /* Sky Blue */
+    color: #38bdf8 !important;
     background: rgba(56, 189, 248, 0.14) !important;
 }
 
@@ -258,7 +295,6 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
     pointer-events: none !important;
 }
 
-/* Editor Toolbar RTL Button */
 .rightflow-editor-btn,
 .antigravity-editor-rtl-btn {
     width: 24px !important;
@@ -310,13 +346,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     var EDITOR_STORAGE_KEY = 'rightflow-editor-active';
     
     // Comprehensive Arabic, Hebrew, Persian & Syriac regex
-    var RTL_REGEX = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
-    var LTR_REGEX = /[A-Za-z\\u00C0-\\u024F\\u0370-\\u03FF\\u0400-\\u04FF]/;
+    var RTL_REGEX = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    var LTR_REGEX = /[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF]/;
 
     /**
      * Smart First Strong Directional Character Detection (Unicode UAX #9)
-     * Strips leading markdown markers, task checkboxes (- [x]), numbers, quotes, emojis,
-     * and checks the first strong linguistic letter.
+     * Strips leading markdown markers, task checkboxes (- [x]), tags ([DONE]),
+     * inline code, numbers, quotes, emojis, and checks the first strong linguistic letter.
      */
     function isRtlText(text) {
         if (!text) return false;
@@ -324,7 +360,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         if (!str) return false;
 
         // Strip markdown prefixes: lists (- , * , 1. ), task boxes (- [x], - [ ]), headers (### ), quotes (> )
-        str = str.replace(/^(\\s*[-*+]\\s+\\[[ xX]\\]\\s*|\\s*#{1,6}\\s+|\\s*>\\s*|\\s*\\d+[\\.\\)]\\s*|\\s*[-*+]\\s+)/, '');
+        str = str.replace(/^(\s*[-*+]\s+\[[ xX]\]\s*|\s*#{1,6}\s+|\s*>\s*|\s*\d+[\.\)]\s*|\s*[-*+]\s+)/, '');
+        // Strip leading tags: [TAG], [DONE], [INFO], [ERROR], etc.
+        str = str.replace(/^\s*\[[^\]]+\]\s*/, '');
+        // Strip leading inline code tokens
+        str = str.replace(/^\s*\x60[^\x60]+\x60\s*/, '');
+        // Strip leading bold markers: **Note:** or **??????:**
+        str = str.replace(/^\s*\*\*[^*]+\*\*\s*[:\-]?\s*/, '');
         str = str.trim();
         if (!str) return false;
 
@@ -340,7 +382,7 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
         var rtlCount = rtlMatches ? rtlMatches.length : 0;
         var ltrCount = ltrMatches ? ltrMatches.length : 0;
-        return rtlCount > ltrCount;
+        return (rtlCount > 0 && rtlCount >= (ltrCount * 0.35));
     }
 
     // Immediately restore saved chat state on startup
@@ -350,15 +392,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         document.body.classList.add(BODY_CLASS);
     }
 
-    // IMPORTANT: Code editor starts strictly in default LTR mode (NO automatic activation).
-    // It only activates when the user clicks the RTL button in the editor toolbar or presses Ctrl+Alt+R.
+    // Monaco code editor starts strictly in default LTR mode (manual activation only).
     document.body.classList.remove(FORCE_EDITOR_CLASS);
     localStorage.setItem(EDITOR_STORAGE_KEY, 'false');
 
     /**
      * 1. Update Monaco Editor Containers
      * STRICTLY MANUAL: Only applies RTL when FORCE_EDITOR_CLASS is active.
-     * NEVER auto-activates based on file content.
      */
     function updateEditorContainers() {
         try {
@@ -379,13 +419,16 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     }
 
     /**
-     * 2. Update elements across Chat, Plans, Work, and Artifacts
+     * 2. Update elements across Universal AI Agents & Panels
+     * Supports: Antigravity IDE, Cursor IDE, VS Code Copilot, Windsurf (Cascade),
+     *           Cline/Roo/Continue Webviews, Plans, Tasks, & Markdown Previews.
+     * Includes DOM Caching to eliminate CPU thrashing during token streaming!
      */
     function updateRtlElements() {
         var isActive = document.body.classList.contains(BODY_CLASS);
 
         var candidateSelectors = [
-            // Chat & Agent Panel
+            // 1. Antigravity IDE (Chat, Plans, Work, Artifacts)
             '.antigravity-agent-side-panel .whitespace-pre-wrap',
             '.antigravity-agent-side-panel .leading-relaxed.select-text',
             '.antigravity-agent-side-panel .select-text > p',
@@ -398,13 +441,6 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             '.antigravity-agent-side-panel .select-text > h4',
             '.antigravity-agent-side-panel .select-text > blockquote',
             '.antigravity-agent-side-panel .select-text table',
-
-            // Antigravity Plans, Work, Artifacts, and Editor Previews
-            '.editor-container .rendered-markdown p',
-            '.editor-container .rendered-markdown li',
-            '.editor-container .rendered-markdown h1, .editor-container .rendered-markdown h2, .editor-container .rendered-markdown h3',
-            '.editor-container .rendered-markdown blockquote',
-            '.editor-container .rendered-markdown table',
             '[data-testid*="artifact"] .select-text p',
             '[data-testid*="artifact"] .select-text li',
             '[data-testid*="plan"] .select-text p',
@@ -416,6 +452,56 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             '.artifact-content h1, .artifact-content h2, .artifact-content h3',
             '.artifact-content blockquote',
 
+            // 2. Cursor IDE (AI Chat, Composer & Inline Chat)
+            '.aichat-container .markdown p',
+            '.aichat-container .markdown li',
+            '.aichat-container p',
+            '.aichat-container li',
+            '.aichat-container blockquote',
+            '.aichat-container h1, .aichat-container h2, .aichat-container h3',
+            '.composer-container .markdown p',
+            '.composer-container .markdown li',
+            '.composer-container p',
+            '.composer-container li',
+            '.composer-container blockquote',
+            '.ai-chat-message p',
+            '.ai-chat-message li',
+            '.cursor-chat-message p',
+            '.cursor-chat-message li',
+
+            // 3. VS Code (GitHub Copilot Chat & Interactive Sessions)
+            '.interactive-session .rendered-markdown p',
+            '.interactive-session .rendered-markdown li',
+            '.interactive-session .rendered-markdown blockquote',
+            '.interactive-session .rendered-markdown h1, .interactive-session .rendered-markdown h2, .interactive-session .rendered-markdown h3',
+            '.chat-widget .rendered-markdown p',
+            '.chat-widget .rendered-markdown li',
+            '.chat-item-container .rendered-markdown p',
+            '.chat-item-container .rendered-markdown li',
+            '.chat-markdown-part p',
+            '.chat-markdown-part li',
+
+            // 4. Windsurf (Cascade Chat)
+            '.cascade-container p',
+            '.cascade-container li',
+            '.cascade-container blockquote',
+            '.cascade-container h1, .cascade-container h2, .cascade-container h3',
+            '.cascade-message p',
+            '.cascade-message li',
+
+            // 5. Universal AI & Webview Markdown (Cline, Roo, Continue, Editor Previews)
+            '.editor-container .rendered-markdown p',
+            '.editor-container .rendered-markdown li',
+            '.editor-container .rendered-markdown h1, .editor-container .rendered-markdown h2, .editor-container .rendered-markdown h3',
+            '.editor-container .rendered-markdown blockquote',
+            '.editor-container .rendered-markdown table',
+            '.markdown-body p',
+            '.markdown-body li',
+            '.markdown-body blockquote',
+            '.markdown-body h1, .markdown-body h2, .markdown-body h3',
+            '[data-message-author] p',
+            '[data-message-author] li',
+
             // General Prose in workbench
             '.prose p',
             '.prose li',
@@ -424,19 +510,30 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
         try {
             var elements = document.querySelectorAll(candidateSelectors);
-            elements.forEach(function(el) {
+            for (var idx = 0; idx < elements.length; idx++) {
+                var el = elements[idx];
                 if (el.tagName === 'PRE' || el.tagName === 'CODE' || el.closest('pre') || el.closest('.interactive-result-code-block')) {
-                    return;
+                    continue;
                 }
 
-                if (isActive && isRtlText(el.textContent)) {
+                // Performance DOM Caching: Skip if text and active state haven't changed!
+                var txt = el.textContent || '';
+                if (el._rfText === txt && el._rfActive === isActive) {
+                    continue;
+                }
+                el._rfText = txt;
+                el._rfActive = isActive;
+
+                if (isActive && isRtlText(txt)) {
+                    el.classList.add('rightflow-is-rtl');
                     el.classList.add('antigravity-is-rtl');
                     el.setAttribute('dir', 'rtl');
                 } else {
+                    el.classList.remove('rightflow-is-rtl');
                     el.classList.remove('antigravity-is-rtl');
                     el.removeAttribute('dir');
                 }
-            });
+            }
         } catch(e) {}
 
         updateInputBoxes();
@@ -445,10 +542,11 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
     /**
      * 3. Real-time dynamic input alignment (Prompt Input)
+     * Supports: Antigravity, Cursor (Lexical), Copilot, Cascade & standard inputs
      */
     function updateInputBoxes() {
         try {
-            var inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"]');
+            var inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"], [data-lexical-editor="true"]');
             inputs.forEach(function(input) {
                 if (input._hasRtlListener) return;
                 input._hasRtlListener = true;
@@ -456,9 +554,11 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
                 function checkInputDirection() {
                     var val = input.value || input.innerText || '';
                     if (isRtlText(val)) {
+                        input.classList.add('rightflow-input-rtl');
                         input.classList.add('antigravity-input-rtl');
                         input.setAttribute('dir', 'rtl');
                     } else {
+                        input.classList.remove('rightflow-input-rtl');
                         input.classList.remove('antigravity-input-rtl');
                         input.setAttribute('dir', 'ltr');
                     }
@@ -511,22 +611,55 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     }
 
     /**
-     * 4. Insert sleek icon button in Antigravity Chat header
+     * 4. Insert sleek icon button in AI Agent Chat Header
+     * Adaptively docks into Antigravity, Cursor, Copilot, or Windsurf toolbars!
      */
     function tryInsertChatButton() {
         if (document.getElementById(BTN_ID)) return;
 
-        var newChatBtn = document.querySelector('a[data-tooltip-id="new-conversation-tooltip"]') ||
-                         document.querySelector('[data-testid="new-conversation-button"]');
+        // 1. Antigravity IDE new conversation button
+        var anchor = document.querySelector('a[data-tooltip-id="new-conversation-tooltip"]') ||
+                     document.querySelector('[data-testid="new-conversation-button"]');
 
-        if (!newChatBtn) return;
-        var container = newChatBtn.parentElement;
+        var container = null;
+        var insertBeforeNode = null;
+
+        if (anchor && anchor.parentElement) {
+            container = anchor.parentElement;
+            insertBeforeNode = anchor.nextSibling;
+        } else {
+            // 2. Cursor IDE chat toolbar
+            var cursorToolbar = document.querySelector('.aichat-container .chat-actions') ||
+                                document.querySelector('.composer-header .actions') ||
+                                document.querySelector('.aichat-header');
+            if (cursorToolbar) {
+                container = cursorToolbar;
+                insertBeforeNode = cursorToolbar.firstChild;
+            } else {
+                // 3. VS Code Copilot Chat title actions
+                var copilotToolbar = document.querySelector('.interactive-session .title-actions .actions-container') ||
+                                     document.querySelector('.chat-widget .title-actions .actions-container');
+                if (copilotToolbar) {
+                    container = copilotToolbar;
+                    insertBeforeNode = copilotToolbar.firstChild;
+                } else {
+                    // 4. Windsurf Cascade toolbar
+                    var cascadeToolbar = document.querySelector('.cascade-header .actions') ||
+                                         document.querySelector('.cascade-toolbar');
+                    if (cascadeToolbar) {
+                        container = cascadeToolbar;
+                        insertBeforeNode = cascadeToolbar.firstChild;
+                    }
+                }
+            }
+        }
+
         if (!container) return;
 
         var btn = document.createElement('a');
         btn.id = BTN_ID;
         btn.href = '#';
-        btn.title = 'RightFlow: تبديل اتجاه الشات والرسائل';
+        btn.title = 'RightFlow: \u062a\u0628\u062f\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 (RTL / LTR)';
         btn.appendChild(createRtlIconSvg());
 
         var saved = localStorage.getItem(STORAGE_KEY);
@@ -551,8 +684,8 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             scheduleUpdate();
         });
 
-        if (newChatBtn.nextSibling) {
-            container.insertBefore(btn, newChatBtn.nextSibling);
+        if (insertBeforeNode) {
+            container.insertBefore(btn, insertBeforeNode);
         } else {
             container.appendChild(btn);
         }
@@ -562,7 +695,6 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
     /**
      * 5. Insert Editor RTL toggle button in Editor Tab Toolbars
-     * Injects into all active editor action toolbars (.editor-actions)
      */
     function tryInsertEditorButtons() {
         var actionContainers = document.querySelectorAll('.editor-actions .actions-container, .title-actions .actions-container');
@@ -575,8 +707,8 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             if (existingBtn) {
                 existingBtn.classList.toggle('active', isForced);
                 existingBtn.title = isForced
-                    ? 'RightFlow: اتجاه المحرر RTL مفعل (اضغط للتعطيل | Ctrl+Alt+R)'
-                    : 'RightFlow: تفعيل اتجاه RTL في المحرر (اضغط للتفعيل | Ctrl+Alt+R)';
+                    ? 'RightFlow: \u062a\u0645 \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0644\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)'
+                    : 'RightFlow: \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0641\u064a \u0627\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)';
                 return;
             }
 
@@ -586,8 +718,8 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             var btn = document.createElement('a');
             btn.className = 'action-label ' + EDITOR_BTN_CLASS;
             btn.title = isForced
-                ? 'RightFlow: اتجاه المحرر RTL مفعل (اضغط للتعطيل | Ctrl+Alt+R)'
-                : 'RightFlow: تفعيل اتجاه RTL في المحرر (اضغط للتفعيل | Ctrl+Alt+R)';
+                ? 'RightFlow: \u062a\u0645 \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0644\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)'
+                : 'RightFlow: \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0641\u064a \u0627\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)';
             btn.appendChild(createRtlIconSvg());
 
             if (isForced) {
@@ -610,26 +742,23 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         document.body.classList.toggle(FORCE_EDITOR_CLASS, isForced);
         localStorage.setItem(EDITOR_STORAGE_KEY, isForced ? 'true' : 'false');
 
-        // Update all editor buttons in all toolbars
         var buttons = document.querySelectorAll('.' + EDITOR_BTN_CLASS);
         buttons.forEach(function(btn) {
             btn.classList.toggle('active', isForced);
             btn.title = isForced 
-                ? 'RightFlow: اتجاه المحرر RTL مفعل (اضغط للتعطيل | Ctrl+Alt+R)'
-                : 'RightFlow: تفعيل اتجاه RTL في المحرر (اضغط للتفعيل | Ctrl+Alt+R)';
+                ? 'RightFlow: \u062a\u0645 \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0644\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)'
+                : 'RightFlow: \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0641\u064a \u0627\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)';
         });
 
-        // Update all editor containers
         updateEditorContainers();
     }
 
     /**
      * 6. Global Keyboard Shortcut Handler: Ctrl+Alt+R & Alt+R
-     * Directly toggles Editor RTL inside the DOM with 0 latency.
-     * Supports both English ('r') and Arabic ('ق' / KeyR) keyboard layouts.
+     * Supports both English ('r') and Arabic ('\u0642' / KeyR) keyboard layouts.
      */
     window.addEventListener('keydown', function(e) {
-        var isRKey = (e.code === 'KeyR' || e.key === 'r' || e.key === 'R' || e.key === 'ق');
+        var isRKey = (e.code === 'KeyR' || e.key === 'r' || e.key === 'R' || e.key === '\u0642');
         var isAltR = e.altKey && !e.ctrlKey && isRKey && !e.shiftKey;
         var isCtrlAltR = e.altKey && e.ctrlKey && isRKey && !e.shiftKey;
 
@@ -642,8 +771,7 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
     /**
      * 7. Intelligent DOM Observer
-     * Filters out internal Monaco line recycling and cursor blinking,
-     * completely eliminating scrolling lag and CPU thrashing!
+     * Filters out Monaco line recycling and cursor blinking.
      */
     try {
         var observer = new MutationObserver(function(mutations) {

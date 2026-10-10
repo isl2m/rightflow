@@ -18,6 +18,18 @@
   line-height: 1.8 !important;
 }
 
+/* BiDi Isolation for Inline Spans, Links & Formatting inside RTL Preview */
+.rtl-block span,
+[dir="rtl"] span,
+.rtl-block a,
+[dir="rtl"] a,
+.rtl-block strong,
+[dir="rtl"] strong,
+.rtl-block em,
+[dir="rtl"] em {
+  unicode-bidi: isolate !important;
+}
+
 /* Force LTR Blocks */
 .ltr-block,
 [dir="ltr"] {

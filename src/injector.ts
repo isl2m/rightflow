@@ -124,7 +124,8 @@ export async function injectRtl(
       changed = true;
     }
 
-    // 3. Write injected CSS & JS to out/vs/workbench
+    // 3. Ensure workbenchDir exists and write injected CSS & JS
+    await fs.mkdir(installation.workbenchDir, { recursive: true });
     const targetCssPath = path.join(
       installation.workbenchDir,
       INJECTED_CSS_FILENAME
@@ -148,13 +149,13 @@ export async function injectRtl(
       const prodJson = JSON.parse(prodJsonStr);
       if (prodJson.checksums) {
         let prodChanged = false;
-        if (installation.checksumKey in prodJson.checksums) {
+        if (prodJson.checksums[installation.checksumKey]) {
           delete prodJson.checksums[installation.checksumKey];
           prodChanged = true;
         }
         if (
           installation.secondaryChecksumKey &&
-          installation.secondaryChecksumKey in prodJson.checksums
+          prodJson.checksums[installation.secondaryChecksumKey]
         ) {
           delete prodJson.checksums[installation.secondaryChecksumKey];
           prodChanged = true;
@@ -162,22 +163,22 @@ export async function injectRtl(
         if (prodChanged) {
           await fs.writeFile(
             installation.productJsonPath,
-            JSON.stringify(prodJson, null, '\t'),
+            JSON.stringify(prodJson, null, '	'),
             'utf-8'
           );
           messages.push('Updated product.json checksums');
           changed = true;
         }
       }
-    } catch (err: any) {
-      messages.push(`Warning updating product.json: ${err.message}`);
+    } catch {
+      messages.push('Notice: Could not modify product.json checksums');
     }
 
     return { messages, changed, permissionError: false };
   } catch (err: any) {
-    const isPerm = err.code === 'EPERM' || err.code === 'EACCES';
-    messages.push(`Injection error: ${err.message}`);
-    return { messages, changed: false, permissionError: isPerm };
+    const isPerm = err.code === 'EACCES' || err.code === 'EPERM';
+    messages.push(`Error: ${err.message}`);
+    return { messages, changed, permissionError: isPerm };
   }
 }
 
@@ -188,88 +189,67 @@ export async function removeRtl(
   let changed = false;
 
   try {
-    // 1. Restore workbench.html from backup if available
     const htmlBackup = installation.workbenchHtmlPath + '.bak';
     if (await fileExists(htmlBackup)) {
       await fs.copyFile(htmlBackup, installation.workbenchHtmlPath);
-      messages.push(
-        `Restored ${path.basename(installation.workbenchHtmlPath)} from backup`
-      );
+      await fs.unlink(htmlBackup);
+      messages.push(`Restored ${path.basename(installation.workbenchHtmlPath)}`);
       changed = true;
     } else {
-      // Clean tags manually
       let html = await fs.readFile(installation.workbenchHtmlPath, 'utf-8');
       html = html.replace(
-        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)\s*-->\s*<link rel="stylesheet"[^>]+>/gi,
+        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
         ''
       );
       html = html.replace(
-        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)\s*-->\s*<script[^>]+><\/script>/gi,
+        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
         ''
       );
       await fs.writeFile(installation.workbenchHtmlPath, html, 'utf-8');
-      messages.push(
-        `Cleaned tags from ${path.basename(installation.workbenchHtmlPath)}`
-      );
       changed = true;
     }
 
-    // 2. Remove injected files
-    const targetCssPath = path.join(
-      installation.workbenchDir,
-      INJECTED_CSS_FILENAME
-    );
-    const targetJsPath = path.join(
-      installation.workbenchDir,
-      INJECTED_JS_FILENAME
-    );
-
-    if (await fileExists(targetCssPath)) {
-      await fs.unlink(targetCssPath);
-      messages.push(`Removed ${INJECTED_CSS_FILENAME}`);
-    }
-    if (await fileExists(targetJsPath)) {
-      await fs.unlink(targetJsPath);
-      messages.push(`Removed ${INJECTED_JS_FILENAME}`);
-    }
-
-    // 3. Restore product.json if backup exists
     const productBackup = installation.productJsonPath + '.bak';
     if (await fileExists(productBackup)) {
       await fs.copyFile(productBackup, installation.productJsonPath);
-      messages.push('Restored product.json from backup');
+      await fs.unlink(productBackup);
+      messages.push(`Restored ${path.basename(installation.productJsonPath)}`);
       changed = true;
     }
 
+    const targetCss = path.join(
+      installation.workbenchDir,
+      INJECTED_CSS_FILENAME
+    );
+    const targetJs = path.join(
+      installation.workbenchDir,
+      INJECTED_JS_FILENAME
+    );
+    if (await fileExists(targetCss)) await fs.unlink(targetCss);
+    if (await fileExists(targetJs)) await fs.unlink(targetJs);
+    messages.push('Cleaned injected assets');
+    changed = true;
+
     return { messages, changed, permissionError: false };
   } catch (err: any) {
-    const isPerm = err.code === 'EPERM' || err.code === 'EACCES';
-    messages.push(`Removal error: ${err.message}`);
-    return { messages, changed: false, permissionError: isPerm };
+    const isPerm = err.code === 'EACCES' || err.code === 'EPERM';
+    messages.push(`Error: ${err.message}`);
+    return { messages, changed, permissionError: isPerm };
   }
 }
 
 export async function reinjectAssets(
   installation: IdeInstallation
-): Promise<InjectionResult> {
-  const messages: string[] = [];
-  try {
-    const cssPath = path.join(
-      installation.workbenchDir,
-      INJECTED_CSS_FILENAME
-    );
-    const jsPath = path.join(
-      installation.workbenchDir,
-      INJECTED_JS_FILENAME
-    );
-
-    await fs.writeFile(cssPath, INJECTED_CSS, 'utf-8');
-    await fs.writeFile(jsPath, INJECTED_JS, 'utf-8');
-    messages.push('Updated injected CSS & JS assets to latest version');
-    return { messages, changed: true, permissionError: false };
-  } catch (err: any) {
-    const isPerm = err.code === 'EPERM' || err.code === 'EACCES';
-    messages.push(`Asset refresh error: ${err.message}`);
-    return { messages, changed: false, permissionError: isPerm };
-  }
+): Promise<void> {
+  await fs.mkdir(installation.workbenchDir, { recursive: true });
+  const targetCss = path.join(
+    installation.workbenchDir,
+    INJECTED_CSS_FILENAME
+  );
+  const targetJs = path.join(
+    installation.workbenchDir,
+    INJECTED_JS_FILENAME
+  );
+  await fs.writeFile(targetCss, INJECTED_CSS, 'utf-8');
+  await fs.writeFile(targetJs, INJECTED_JS, 'utf-8');
 }

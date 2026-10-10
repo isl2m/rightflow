@@ -43,15 +43,16 @@ async function promptRestart(changed: boolean) {
 }
 
 async function handlePermissionError(workbenchPath: string) {
+  const ideName = vscode.env.appName || 'the IDE';
   if (process.platform === 'win32') {
     vscode.window.showErrorMessage(
-      'RightFlow: Permission denied. Please restart Antigravity IDE as Administrator to apply the patch.'
+      `RightFlow: Permission denied. Please restart ${ideName} as Administrator to apply the patch.`
     );
   } else if (process.platform === 'darwin') {
     const appMatch = workbenchPath.match(/\/[^/]+\.app\//);
     const appDir = appMatch
       ? workbenchPath.substring(0, appMatch.index! + appMatch[0].length - 1)
-      : '/Applications/Antigravity IDE.app';
+      : `/Applications/${ideName}.app`;
     const fixCmd = `sudo chown -R $(whoami) "${appDir}"`;
 
     const choice = await vscode.window.showErrorMessage(
@@ -73,7 +74,7 @@ async function handlePermissionError(workbenchPath: string) {
 
 export async function activate(context: vscode.ExtensionContext) {
   const channel = getOutputChannel();
-  const currentVersion = context.extension.packageJSON.version || '1.0.6';
+  const currentVersion = context.extension.packageJSON.version || '1.0.9';
 
   // Create status bar item
   const statusBar = createStatusBarItem();
@@ -95,8 +96,8 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       channel.clear();
-      channel.appendLine('Activating RightFlow Engine...');
-      channel.appendLine('Supports: Chat, Plans (*.plan.md), Work/Tasks, Artifacts, and Previews.\n');
+      channel.appendLine('Activating RightFlow Universal RTL Engine...');
+      channel.appendLine('Supports: Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, Work, & Editor.\n');
 
       let anyChanged = false;
       let hasPermissionError = false;
@@ -162,13 +163,9 @@ export async function activate(context: vscode.ExtensionContext) {
   // Command: Control Menu
   const menuCmd = vscode.commands.registerCommand(
     'rightflow.toggleMenu',
-    showRtlControlMenu
-  );
-
-  // Command: Setup Arabic Fonts
-  const fontsCmd = vscode.commands.registerCommand(
-    'rightflow.setupFonts',
-    setupRecommendedArabicFonts
+    async () => {
+      await showRtlControlMenu();
+    }
   );
 
   // Command: Status & Diagnostics
@@ -176,115 +173,87 @@ export async function activate(context: vscode.ExtensionContext) {
     'rightflow.status',
     async () => {
       const installations = await findIdeInstallations();
+      if (installations.length === 0) {
+        vscode.window.showErrorMessage(
+          'RightFlow: No IDE installation directory found.'
+        );
+        return;
+      }
+
       channel.clear();
       channel.appendLine('=== RightFlow Diagnostics ===');
-      channel.appendLine(`Extension Version: ${currentVersion}`);
-      channel.appendLine(`Saved Mode: ${context.globalState.get(STORAGE_MODE_KEY, 'inactive')}\n`);
+      channel.appendLine(`Version: ${currentVersion}`);
+      channel.appendLine(`Platform: ${process.platform}`);
+      channel.appendLine(`IDE: ${vscode.env.appName || 'Unknown'}`);
+      channel.appendLine(`App Root: ${vscode.env.appRoot}\n`);
 
-      if (installations.length === 0) {
-        channel.appendLine('No IDE installation found.');
-      } else {
-        for (const inst of installations) {
-          const s = await checkStatus(inst);
-          channel.appendLine(`Installation: ${inst.ideName}`);
-          channel.appendLine(`  RTL Patch Injected: ${s.isInstalled ? 'YES' : 'NO'}`);
-          channel.appendLine(`  Assets Up to Date:  ${s.assetsUpToDate ? 'YES' : 'NO'}`);
-          channel.appendLine(`  HTML Backup Exists: ${s.htmlBackupExists ? 'YES' : 'NO'}`);
-          channel.appendLine(`  Workbench Path:     ${inst.workbenchHtmlPath}`);
-          channel.appendLine(`  Workbench Dir:      ${inst.workbenchDir}`);
-          channel.appendLine(`  Product.json:       ${inst.productJsonPath}\n`);
+      for (const inst of installations) {
+        channel.appendLine(`Target: ${inst.ideName}`);
+        channel.appendLine(`  workbench.html: ${inst.workbenchHtmlPath}`);
+        channel.appendLine(`  workbenchDir: ${inst.workbenchDir}`);
+        channel.appendLine(`  product.json: ${inst.productJsonPath}`);
+
+        const status = await checkStatus(inst);
+        channel.appendLine(`  Installed: ${status.isInstalled}`);
+        channel.appendLine(`  HTML Backup: ${status.htmlBackupExists}`);
+        channel.appendLine(`  Product Backup: ${status.productBackupExists}`);
+        channel.appendLine(`  Assets Up-to-Date: ${status.assetsUpToDate}`);
+        if (inst.secondaryHtmlPath) {
+          channel.appendLine(`  Secondary HTML: ${inst.secondaryHtmlPath}`);
         }
+        channel.appendLine('');
       }
 
       channel.show(true);
-      await updateStatusBarText();
     }
   );
 
-  // Command: Restart/Re-inject
+  // Command: Restart / Re-inject
   const restartCmd = vscode.commands.registerCommand(
     'rightflow.restart',
     async () => {
       const installations = await findIdeInstallations();
-      if (installations.length === 0) return;
-      channel.clear();
-      channel.appendLine('Re-injecting RightFlow assets...');
-      let changed = false;
       for (const inst of installations) {
-        const res = await reinjectAssets(inst);
-        res.messages.forEach((m) => channel.appendLine(`  ${m}`));
-        if (res.changed) changed = true;
+        await reinjectAssets(inst);
       }
-      channel.show(true);
-      await promptRestart(changed);
+      vscode.window.showInformationMessage('RightFlow: Re-injected assets.');
+      await promptRestart(true);
     }
   );
 
-  // Command: Toggle Chat RTL Mode
-  const toggleChatCmd = vscode.commands.registerCommand(
-    'rightflow.toggleChatRtl',
-    () => {
-      vscode.window.showInformationMessage(
-        'RightFlow: Chat RTL applies automatically to Arabic text. You can also toggle it instantly using the RTL icon in the Chat header.'
-      );
+  // Command: Setup Arabic Typography in Editor
+  const fontsCmd = vscode.commands.registerCommand(
+    'rightflow.setupFonts',
+    async () => {
+      await setupRecommendedArabicFonts();
     }
   );
+
+  // Auto-update assets across extension upgrades
+  const prevVersion = context.globalState.get<string>(STORAGE_VERSION_KEY);
+  if (prevVersion && prevVersion !== currentVersion) {
+    const installations = await findIdeInstallations();
+    for (const inst of installations) {
+      const isInst = await isAlreadyInjected(inst);
+      if (isInst) {
+        await reinjectAssets(inst);
+      }
+    }
+  }
+  await context.globalState.update(STORAGE_VERSION_KEY, currentVersion);
 
   context.subscriptions.push(
     activateCmd,
     deactivateCmd,
     menuCmd,
-    toggleChatCmd,
-    fontsCmd,
     statusCmd,
-    restartCmd
+    restartCmd,
+    fontsCmd
   );
 
-  // Auto-reactivate / update assets if needed
-  checkAutoReactivate(context, currentVersion).catch((err) => {
-    channel.appendLine(`Auto-check error: ${err}`);
-  });
-
-  // Initial status bar update
-  updateStatusBarText().catch((err) => {
-    channel.appendLine(`Status bar error: ${err}`);
-  });
-}
-
-async function checkAutoReactivate(
-  context: vscode.ExtensionContext,
-  currentVersion: string
-) {
-  const savedVersion = context.globalState.get<string>(STORAGE_VERSION_KEY);
-  const savedMode = context.globalState.get<RtlMode>(STORAGE_MODE_KEY);
-
-  // If new extension version, update assets
-  if (savedVersion !== currentVersion) {
-    await context.globalState.update(STORAGE_VERSION_KEY, currentVersion);
-    const installations = await findIdeInstallations();
-    for (const inst of installations) {
-      if (await isAlreadyInjected(inst)) {
-        await reinjectAssets(inst);
-      }
-    }
-  }
-
-  // If mode is active, ensure injection is intact (e.g. after IDE upgrade)
-  if (savedMode === 'active') {
-    const installations = await findIdeInstallations();
-    for (const inst of installations) {
-      const injected = await isAlreadyInjected(inst);
-      if (!injected) {
-        const res = await injectRtl(inst);
-        if (res.changed) {
-          await promptRestart(true);
-        }
-      }
-    }
-  }
+  await updateStatusBarText();
 }
 
 export function deactivate() {
   disposeStatusBar();
-  outputChannel?.dispose();
 }

@@ -4,16 +4,31 @@
 
   # RightFlow
   
-  **Native BiDi & RTL Engine for Antigravity IDE**  
-  *High-performance right-to-left alignment for Agent Chat, Markdown, Plans, and Monaco Editor.*
+  **Universal BiDi and RTL Engine for AI Coding IDEs and Agents**  
+  *High-performance right-to-left alignment for Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, and Monaco Editor.*
 
-  [![Version](https://img.shields.io/badge/version-1.0.8-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow/releases)
+  [![Version](https://img.shields.io/badge/version-1.0.9-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow/releases)
   [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&color=purple)](https://open-vsx.org/extension/isl2m/rightflow)
   [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/isl2m/rightflow/blob/main/LICENSE)
+  [![Universal Agents](https://img.shields.io/badge/Agents-Antigravity%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Cascade-orange.svg?style=flat-square)](#supported-ides--ai-agents)
   [![Antigravity IDE](https://img.shields.io/badge/Antigravity%20IDE-v1.90+-indigo.svg?style=flat-square)](https://antigravity.google)
   [![BiDi](https://img.shields.io/badge/BiDi-Arabic%20%7C%20Hebrew%20%7C%20Persian-cyan.svg?style=flat-square)](#overview)
 
 </div>
+
+---
+
+## Supported IDEs and AI Agents
+
+RightFlow is engineered as a **Universal RTL Suite** across modern AI code editors:
+
+| IDE / Environment | AI Agent and Panels Supported | Injection Mechanism |
+| :--- | :--- | :--- |
+| **Antigravity IDE** | Agent Side Panel, Plans (`*.plan.md`), Artifacts, Work | Native Workbench and DOM Hook |
+| **Cursor IDE** | AI Chat, Composer, Inline Chat, Agent Prompts | Native Workbench and Lexical Hook |
+| **VS Code** | GitHub Copilot Chat, Interactive Sessions, Chat Widgets | Native Workbench and Monaco Hook |
+| **Windsurf** | Cascade Chat, Agent Messages, Cascade Input | Native Workbench and Cascade Hook |
+| **Universal Webviews** | Cline, Roo Code, Continue, Claude Dev, Aider | Markdown Preview Engine |
 
 ---
 
@@ -29,12 +44,12 @@ When working with Arabic, Hebrew, or Persian in AI-assisted development environm
 
 | Feature | Default IDE / Legacy Tools | **RightFlow** |
 | :--- | :--- | :--- |
-| **Agent Chat & Thoughts** | LTR only or broken inline code | **Native BiDi** — Arabic flows RTL, English/code stays LTR |
+| **Agent Chat and Thoughts** | LTR only or broken inline code | **Native BiDi** — Arabic flows RTL, English/code stays LTR |
 | **Prompt Input Textarea** | Punctuation floats on the left | **Dynamic auto-direction** as you type |
 | **Plan Files (`*.plan.md`)** | Unformatted LTR reading | **First-class RTL** in both preview and editor |
 | **Markdown Previews (`.md`)** | Left-aligned by default | **Auto-detected blocks** with interactive toolbar |
 | **Code Editor (Monaco)** | Uncontrolled flipping or lags | **Strict manual toggle only** (`Ctrl+Alt+R`) |
-| **Editor Scrolling Performance** | Line jumping & DOM thrashing | **Zero latency** — pure CSS-scoped rules (60fps) |
+| **Editor Scrolling Performance** | Line jumping and DOM thrashing | **Zero latency** — pure CSS-scoped rules (60fps) |
 | **Mixed Code Strings** | Scrambled syntax (`function()`) | Isolated via `unicode-bidi: isolate` |
 | **Typography** | Default browser fallback | Tailored Arabic font stack (`Segoe UI`, `Tahoma`) |
 
@@ -42,7 +57,7 @@ When working with Arabic, Hebrew, or Persian in AI-assisted development environm
 
 ## Key Features
 
-### 1. Smart Agent Chat & Thought Trace BiDi
+### 1. Smart Agent Chat and Thought Trace BiDi
 - Automatically analyzes paragraphs in agent messages, user prompts, thinking blocks, and tool executions.
 - Arabic sentences align neatly to the right with correct punctuation, while English responses and technical terms remain LTR.
 
@@ -58,7 +73,7 @@ When working with Arabic, Hebrew, or Persian in AI-assisted development environm
 - When working on Arabic documentation, translation strings, or markdown notes, toggle RTL instantly using the editor title button or keyboard shortcut.
 - Virtualized lines recycle without layout shift, horizontal jitter, or scroll stutter.
 
-### 5. Strict Code & Syntax Isolation
+### 5. Strict Code and Syntax Isolation
 - Inline code tags (`` `const value = 42;` ``), paths, and shell commands embedded inside Arabic sentences are strictly isolated via `unicode-bidi: isolate`.
 - Code blocks (` ```js `) always stay left-to-right with intact syntax indentation.
 
@@ -80,7 +95,7 @@ When working with Arabic, Hebrew, or Persian in AI-assisted development environm
 1. **Install:** Ensure the extension is enabled in your Antigravity IDE extensions list.
 2. **Reload:** Press `Ctrl+Shift+P` (or `F1`), run **`Developer: Reload Window`**.
 3. **Usage:**
-   - **Chat & Plans:** RTL applies automatically to Arabic text.
+   - **Chat and Plans:** RTL applies automatically to Arabic text.
    - **Code Editor:** Click the **RTL** icon in the editor toolbar (top right) or press **`Ctrl + Alt + R`** whenever you wish to view/edit a file in RTL mode.
 
 ---
@@ -101,7 +116,7 @@ Customize RightFlow via `settings.json`:
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `rightflow.autoDetect` | `boolean` | `true` | Automatically detect Arabic paragraphs in Chat & Plans. |
+| `rightflow.autoDetect` | `boolean` | `true` | Automatically detect Arabic paragraphs in Chat and Plans. |
 | `rightflow.supportPromptInput` | `boolean` | `true` | Align chat input textarea based on the typed language. |
 | `rightflow.enhanceFonts` | `boolean` | `true` | Apply high-readability Arabic typography stack. |
 | `rightflow.lineHeightRatio` | `number` | `1.75` | Proportional line-height to avoid diacritic clipping. |
@@ -124,7 +139,7 @@ Customize RightFlow via `settings.json`:
 
 ---
 
-## Troubleshooting & FAQ
+## Troubleshooting and FAQ
 
 <details>
 <summary><strong>لماذا لا يتم تفعيل اتجاه RTL تلقائياً داخل محرر الأكواد؟</strong></summary>
@@ -146,7 +161,7 @@ Customize RightFlow via `settings.json`:
 
 ---
 
-## Author & Credits
+## Author and Credits
 
 - **Developer:** Islam Fathy ([@isl2m](https://github.com/isl2m))
 - **Publisher ID:** `isl2m`

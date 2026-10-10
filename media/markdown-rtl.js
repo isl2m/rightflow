@@ -21,6 +21,12 @@
 
     // Strip markdown prefixes: lists (- , * , 1. ), task boxes (- [x], - [ ]), headers (### ), quotes (> )
     str = str.replace(/^(\s*[-*+]\s+\[[ xX]\]\s*|\s*#{1,6}\s+|\s*>\s*|\s*\d+[\.\)]\s*|\s*[-*+]\s+)/, '');
+    // Strip leading bracketed tags: [TAG], [DONE], [INFO], etc.
+    str = str.replace(/^\s*\[[^\]]+\]\s*/, '');
+    // Strip leading inline code: `file.ext`
+    str = str.replace(/^\s*\x60[^\x60]+\x60\s*/, '');
+    // Strip leading bold markers: **Note:** or **??????:**
+    str = str.replace(/^\s*\*\*[^*]+\*\*\s*[:\-]?\s*/, '');
     str = str.trim();
     if (!str) return false;
 
@@ -35,7 +41,7 @@
     var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
     var rtlCount = rtlMatches ? rtlMatches.length : 0;
     var ltrCount = ltrMatches ? ltrMatches.length : 0;
-    return rtlCount > ltrCount;
+    return (rtlCount > 0 && rtlCount >= (ltrCount * 0.35));
   }
 
   function applyRtlToBlocks() {
