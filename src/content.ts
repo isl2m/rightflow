@@ -47,6 +47,20 @@ export const INJECTED_CSS = `/* === RIGHTFLOW-START === */
     line-height: 1.5 !important;
 }
 
+/* Code Block Header, Action buttons, Copy button STAY LTR */
+.antigravity-is-rtl .code-block-header,
+.antigravity-is-rtl .code-block,
+.antigravity-is-rtl .code-actions,
+.antigravity-is-rtl .code-actions-container,
+.antigravity-is-rtl button[data-tooltip-id*="copy"],
+[data-rtl="true"] .code-block-header,
+[data-rtl="true"] .code-block,
+[data-rtl="true"] .code-actions {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: isolate !important;
+}
+
 /* Blockquotes in RTL: Border flips to the RIGHT side */
 .antigravity-is-rtl blockquote,
 [data-rtl="true"] blockquote,
@@ -80,13 +94,20 @@ blockquote.antigravity-is-rtl {
     text-align: right !important;
 }
 
+.antigravity-is-rtl ol li::marker,
+.antigravity-is-rtl ul li::marker {
+    unicode-bidi: isolate !important;
+}
+
 /* Checkbox lists / Task lists in Plan & Work */
 .antigravity-is-rtl li input[type="checkbox"],
 [data-rtl="true"] li input[type="checkbox"],
-.antigravity-task-item input[type="checkbox"] {
+.antigravity-task-item input[type="checkbox"],
+.antigravity-is-rtl .task-list-item-checkbox {
     margin-right: 0 !important;
-    margin-left: 0.6rem !important;
+    margin-left: 0.65rem !important;
     cursor: pointer !important;
+    vertical-align: middle !important;
 }
 
 /* Headings in RTL */
@@ -140,6 +161,7 @@ div[contenteditable="true"].antigravity-input-rtl {
     text-align: right !important;
     unicode-bidi: plaintext !important;
     font-family: 'Segoe UI', 'Cairo', 'Tajawal', Tahoma, sans-serif !important;
+    caret-color: var(--vscode-editorCursor-foreground, currentColor) !important;
 }
 
 /* ==========================================================================
@@ -289,10 +311,36 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     
     // Comprehensive Arabic, Hebrew, Persian & Syriac regex
     var RTL_REGEX = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
+    var LTR_REGEX = /[A-Za-z\\u00C0-\\u024F\\u0370-\\u03FF\\u0400-\\u04FF]/;
 
+    /**
+     * Smart First Strong Directional Character Detection (Unicode UAX #9)
+     * Strips leading markdown markers, task checkboxes (- [x]), numbers, quotes, emojis,
+     * and checks the first strong linguistic letter.
+     */
     function isRtlText(text) {
         if (!text) return false;
-        return RTL_REGEX.test(text);
+        var str = text.trim();
+        if (!str) return false;
+
+        // Strip markdown prefixes: lists (- , * , 1. ), task boxes (- [x], - [ ]), headers (### ), quotes (> )
+        str = str.replace(/^(\\s*[-*+]\\s+\\[[ xX]\\]\\s*|\\s*#{1,6}\\s+|\\s*>\\s*|\\s*\\d+[\\.\\)]\\s*|\\s*[-*+]\\s+)/, '');
+        str = str.trim();
+        if (!str) return false;
+
+        // Scan characters for first strong directional letter
+        for (var i = 0; i < str.length; i++) {
+            var ch = str.charAt(i);
+            if (RTL_REGEX.test(ch)) return true;
+            if (LTR_REGEX.test(ch)) return false;
+        }
+
+        // Fallback: character count ratio if mixed without clear first strong
+        var rtlMatches = str.match(new RegExp(RTL_REGEX.source, 'g'));
+        var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
+        var rtlCount = rtlMatches ? rtlMatches.length : 0;
+        var ltrCount = ltrMatches ? ltrMatches.length : 0;
+        return rtlCount > ltrCount;
     }
 
     // Immediately restore saved chat state on startup
@@ -418,6 +466,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
                 input.addEventListener('input', checkInputDirection);
                 input.addEventListener('keyup', checkInputDirection);
+                input.addEventListener('paste', function() {
+                    setTimeout(checkInputDirection, 10);
+                });
+                input.addEventListener('cut', function() {
+                    setTimeout(checkInputDirection, 10);
+                });
+                input.addEventListener('change', checkInputDirection);
                 checkInputDirection();
             });
         } catch(e) {}

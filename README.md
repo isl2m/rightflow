@@ -7,8 +7,8 @@
   **Native BiDi & RTL Engine for Antigravity IDE**  
   *High-performance right-to-left alignment for Agent Chat, Markdown, Plans, and Monaco Editor.*
 
-  [![Version](https://img.shields.io/badge/version-1.0.5-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow)
-  [![Open VSX](https://img.shields.io/badge/Open%20VSX-v1.0.5-purple.svg?style=flat-square)](https://open-vsx.org/extension/isl2m/rightflow)
+  [![Version](https://img.shields.io/badge/version-1.0.6-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow)
+  [![Open VSX](https://img.shields.io/badge/Open%20VSX-v1.0.6-purple.svg?style=flat-square)](https://open-vsx.org/extension/isl2m/rightflow)
   [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/isl2m/rightflow/blob/main/LICENSE)
   [![Antigravity IDE](https://img.shields.io/badge/Antigravity%20IDE-v1.90+-indigo.svg?style=flat-square)](https://antigravity.google)
   [![BiDi](https://img.shields.io/badge/BiDi-Arabic%20%7C%20Hebrew%20%7C%20Persian-cyan.svg?style=flat-square)](#overview)

@@ -7,12 +7,35 @@
 
   var STORAGE_KEY = 'antigravity-preview-rtl-mode'; // 'auto' | 'rtl' | 'ltr'
   var RTL_REGEX = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  var LTR_REGEX = /[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF]/;
 
   var currentMode = localStorage.getItem(STORAGE_KEY) || 'auto';
 
+  /**
+   * Smart First Strong Directional Character Detection
+   */
   function isRtl(text) {
     if (!text) return false;
-    return RTL_REGEX.test(text);
+    var str = text.trim();
+    if (!str) return false;
+
+    // Strip markdown prefixes: lists (- , * , 1. ), task boxes (- [x], - [ ]), headers (### ), quotes (> )
+    str = str.replace(/^(\s*[-*+]\s+\[[ xX]\]\s*|\s*#{1,6}\s+|\s*>\s*|\s*\d+[\.\)]\s*|\s*[-*+]\s+)/, '');
+    str = str.trim();
+    if (!str) return false;
+
+    // Scan characters for first strong directional letter
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charAt(i);
+      if (RTL_REGEX.test(ch)) return true;
+      if (LTR_REGEX.test(ch)) return false;
+    }
+
+    var rtlMatches = str.match(new RegExp(RTL_REGEX.source, 'g'));
+    var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
+    var rtlCount = rtlMatches ? rtlMatches.length : 0;
+    var ltrCount = ltrMatches ? ltrMatches.length : 0;
+    return rtlCount > ltrCount;
   }
 
   function applyRtlToBlocks() {

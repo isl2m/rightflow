@@ -2,7 +2,7 @@
   "name": "rightflow",
   "displayName": "RightFlow - RTL & Arabic Engine for Antigravity",
   "description": "Seamless Arabic, Hebrew & Persian RTL and BiDi engine for Antigravity IDE: Chat, Prompt Input, Plan files (*.plan.md), Work/Tasks, Markdown Previews, and Monaco Editor.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "publisher": "isl2m",
   "author": "Islam Fathy",
   "license": "MIT",
@@ -91,6 +91,17 @@
         "command": "rightflow.toggleMenu",
         "key": "ctrl+alt+shift+r",
         "mac": "cmd+alt+shift+r"
+      },
+      {
+        "command": "rightflow.toggleEditorRtl",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r"
+      },
+      {
+        "command": "rightflow.toggleEditorRtl",
+        "key": "alt+r",
+        "mac": "alt+r",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -121,6 +132,16 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically detect Arabic/RTL text and apply RTL direction only to RTL paragraphs."
+        },
+        "rightflow.smartBiDi": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable smart First-Strong-Character BiDi detection to prevent English paragraphs with Arabic words from flipping."
+        },
+        "rightflow.chatFontFamily": {
+          "type": "string",
+          "default": "'Segoe UI', 'Cairo', 'Tajawal', 'Almarai', Tahoma, sans-serif",
+          "description": "Custom font family stack for Arabic text in Chat, Plans, and Previews."
         },
         "rightflow.enhanceFonts": {
           "type": "boolean",

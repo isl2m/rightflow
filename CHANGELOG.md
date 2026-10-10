@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.6] - 2026-10-10
+
+### Added
+- **Official Editor Keybindings:** Registered `Ctrl+Alt+R` and `Alt+R` natively in VS Code keybindings so users can inspect and rebind them.
+- **Customizable Font Settings:** Added `rightflow.chatFontFamily` and `rightflow.smartBiDi` options in settings UI.
+- **Instant Paste/Cut Direction:** Real-time alignment triggers immediately on clipboard `paste` and `cut` events in chat prompt inputs.
+
+### Improved
+- **Smart First-Strong BiDi Algorithm (Unicode UAX #9):** Accurately detects primary paragraph direction, preventing English sentences with embedded Arabic words from accidentally flipping to RTL.
+- **Strict Code Block & Copy Button Isolation:** Guaranteed LTR layout for code headers, action bars, and copy buttons within RTL responses.
+- **Task List & Checklist Alignment:** Precise RTL vertical alignment for `- [ ]` and `- [x]` checkboxes in Plan files and Work tasks.
+
+---
+
 ## [1.0.5] - 2026-10-10
 
 ### Changed
