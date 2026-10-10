@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.7] - 2026-10-11
+
+### Added & Enhanced
+- Official v1.0.7 release with Smart First-Strong BiDi (Unicode UAX #9).
+- Dynamic Prompt Input & Chat input text alignment.
+- Editor toggle keybindings (Ctrl+Alt+R / Alt+R).
+- Configurable Arabic typography stack and line-height.
+
 ## [1.0.6] - 2026-10-10
 
 ### Added

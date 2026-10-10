@@ -2,7 +2,7 @@
   "name": "rightflow",
   "displayName": "RightFlow - RTL & Arabic Engine for Antigravity",
   "description": "Seamless Arabic, Hebrew & Persian RTL and BiDi engine for Antigravity IDE: Chat, Prompt Input, Plan files (*.plan.md), Work/Tasks, Markdown Previews, and Monaco Editor.",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "publisher": "isl2m",
   "author": "Islam Fathy",
   "license": "MIT",
