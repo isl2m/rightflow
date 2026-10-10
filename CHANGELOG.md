@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.8] - 2026-10-11
+
+### Updated
+- Updated documentation and dynamic Open VSX badges.
+
 ## [1.0.7] - 2026-10-11
 
 ### Added & Enhanced
