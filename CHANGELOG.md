@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.5] - 2026-10-10
+
+### Changed
+- Standardized official publisher namespace to `isl2m` matching developer GitHub identity for instant verification on Open VSX Registry.
+- Updated documentation and marketplace badges.
+
+---
+
 ## [1.0.4] - 2026-10-10
 
 ### Added
