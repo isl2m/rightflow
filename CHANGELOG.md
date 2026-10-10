@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.10] - 2026-10-11
+
+### Fixed
+- **Open VSX and Registry Logo Rendering:** Replaced relative path with absolute raw GitHub asset URL for reliable icon rendering across Open VSX and external marketplaces.
+
+---
+
 ## [1.0.9] - 2026-10-11
 
 ### Added - Universal AI Agent Suite

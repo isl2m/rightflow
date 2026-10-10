@@ -74,7 +74,7 @@ async function handlePermissionError(workbenchPath: string) {
 
 export async function activate(context: vscode.ExtensionContext) {
   const channel = getOutputChannel();
-  const currentVersion = context.extension.packageJSON.version || '1.0.9';
+  const currentVersion = context.extension.packageJSON.version || '1.0.10';
 
   // Create status bar item
   const statusBar = createStatusBarItem();

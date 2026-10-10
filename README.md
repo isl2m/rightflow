@@ -1,13 +1,13 @@
 <div align="center">
 
-  <img src="./icon.png" width="128" height="128" alt="RightFlow Logo" style="border-radius: 28px;" />
+  <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/icon.png" width="128" height="128" alt="RightFlow Logo" style="border-radius: 28px;" />
 
   # RightFlow
   
   **Universal BiDi and RTL Engine for AI Coding IDEs and Agents**  
   *High-performance right-to-left alignment for Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, and Monaco Editor.*
 
-  [![Version](https://img.shields.io/badge/version-1.0.9-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow/releases)
+  [![Version](https://img.shields.io/badge/version-1.0.10-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow/releases)
   [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&color=purple)](https://open-vsx.org/extension/isl2m/rightflow)
   [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/isl2m/rightflow/blob/main/LICENSE)
   [![Universal Agents](https://img.shields.io/badge/Agents-Antigravity%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Cascade-orange.svg?style=flat-square)](#supported-ides--ai-agents)
