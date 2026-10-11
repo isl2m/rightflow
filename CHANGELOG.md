@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.13] - 2026-10-11
+
+### Added
+- **Command Palette Chat Toggle:** Registered `rightflow.toggleChatRtl` command in the extension host with interactive quick-pick actions for status management.
+- **Dynamic Configuration Injection:** Real-time synchronization of custom typography (`rightflow.chatFontFamily`, `rightflow.lineHeightRatio`, and `rightflow.enhanceFonts`) directly into injected workbench styles.
+- **Automated Open VSX Release Pipeline:** Robust CI/CD workflow publishing deterministic VSIX packages to Open VSX upon GitHub Releases.
+
+---
+
 ## [1.0.12] - 2026-10-11
 
 ### Fixed
