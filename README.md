@@ -7,7 +7,7 @@
   **Universal BiDi and RTL Engine for AI Coding IDEs and Agents**  
   *High-performance right-to-left alignment for Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, and Monaco Editor.*
 
-  [![Version](https://img.shields.io/badge/version-1.0.15-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow/releases)
+  [![Version](https://img.shields.io/badge/version-1.0.16-blue.svg?style=flat-square)](https://github.com/isl2m/rightflow/releases)
   [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&color=purple)](https://open-vsx.org/extension/isl2m/rightflow)
   [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/isl2m/rightflow/blob/main/LICENSE)
   [![Universal Agents](https://img.shields.io/badge/Agents-Antigravity%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Cascade-orange.svg?style=flat-square)](#supported-ides--ai-agents)
