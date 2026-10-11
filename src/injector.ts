@@ -6,6 +6,7 @@ import {
   INJECTED_CSS_FILENAME,
   INJECTED_JS,
   INJECTED_JS_FILENAME,
+  getInjectedCss,
 } from './content';
 
 async function fileExists(filePath: string): Promise<boolean> {
@@ -57,8 +58,9 @@ export async function checkStatus(
     );
     const cssContent = await fs.readFile(cssPath, 'utf-8');
     const jsContent = await fs.readFile(jsPath, 'utf-8');
+    const expectedCss = getInjectedCss();
     assetsUpToDate =
-      cssContent === INJECTED_CSS && jsContent === INJECTED_JS;
+      cssContent === expectedCss && jsContent === INJECTED_JS;
   } catch {
     assetsUpToDate = false;
   }
@@ -135,7 +137,7 @@ export async function injectRtl(
       INJECTED_JS_FILENAME
     );
 
-    await fs.writeFile(targetCssPath, INJECTED_CSS, 'utf-8');
+    await fs.writeFile(targetCssPath, getInjectedCss(), 'utf-8');
     await fs.writeFile(targetJsPath, INJECTED_JS, 'utf-8');
     messages.push(`Assets deployed to ${installation.workbenchDir}`);
     changed = true;
@@ -250,6 +252,6 @@ export async function reinjectAssets(
     installation.workbenchDir,
     INJECTED_JS_FILENAME
   );
-  await fs.writeFile(targetCss, INJECTED_CSS, 'utf-8');
+  await fs.writeFile(targetCss, getInjectedCss(), 'utf-8');
   await fs.writeFile(targetJs, INJECTED_JS, 'utf-8');
 }

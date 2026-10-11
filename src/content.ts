@@ -1,3 +1,5 @@
+import * as vscode from 'vscode';
+
 export const INJECTED_CSS_FILENAME = 'rightflow.css';
 export const INJECTED_JS_FILENAME = 'rightflow.js';
 
@@ -16,8 +18,8 @@ export const INJECTED_CSS = `/* === RIGHTFLOW-START === */
     direction: rtl !important;
     text-align: right !important;
     unicode-bidi: isolate !important;
-    font-family: 'Segoe UI', 'Cairo', 'Tajawal', 'Almarai', Tahoma, -apple-system, sans-serif !important;
-    line-height: 1.75 !important;
+    font-family: var(--rightflow-chat-font-family, 'Segoe UI', 'Cairo', 'Tajawal', 'Almarai', Tahoma, -apple-system, sans-serif) !important;
+    line-height: var(--rightflow-chat-line-height, 1.75) !important;
 }
 
 /* BiDi Isolation for Inline Spans, Links & Formatting inside RTL sentences */
@@ -209,7 +211,7 @@ div[contenteditable="true"].antigravity-input-rtl {
     direction: rtl !important;
     text-align: right !important;
     unicode-bidi: plaintext !important;
-    font-family: 'Segoe UI', 'Cairo', 'Tajawal', Tahoma, sans-serif !important;
+    font-family: var(--rightflow-chat-font-family, 'Segoe UI', 'Cairo', 'Tajawal', Tahoma, sans-serif) !important;
     caret-color: var(--vscode-editorCursor-foreground, currentColor) !important;
 }
 
@@ -365,7 +367,7 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         str = str.replace(/^\s*\[[^\]]+\]\s*/, '');
         // Strip leading inline code tokens
         str = str.replace(/^\s*\x60[^\x60]+\x60\s*/, '');
-        // Strip leading bold markers: **Note:** or **??????:**
+        // Strip leading bold markers: **Note:** or **ملاحظة:**
         str = str.replace(/^\s*\*\*[^*]+\*\*\s*[:\-]?\s*/, '');
         str = str.trim();
         if (!str) return false;
@@ -841,3 +843,24 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 })();
 /* === RIGHTFLOW-JS-END === */
 `;
+
+export function getInjectedCss(): string {
+  try {
+    const config = vscode.workspace.getConfiguration('rightflow');
+    const fontFamily = config.get<string>(
+      'chatFontFamily',
+      "'Segoe UI', 'Cairo', 'Tajawal', 'Almarai', Tahoma, -apple-system, sans-serif"
+    );
+    const lineHeight = config.get<number>('lineHeightRatio', 1.75);
+    const enhanceFonts = config.get<boolean>('enhanceFonts', true);
+
+    const activeFont = enhanceFonts
+      ? fontFamily
+      : "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+    const customVars = `/* RightFlow User Custom Settings */\n:root {\n    --rightflow-chat-font-family: ${activeFont};\n    --rightflow-chat-line-height: ${lineHeight};\n}\n\n`;
+    return customVars + INJECTED_CSS;
+  } catch {
+    return INJECTED_CSS;
+  }
+}

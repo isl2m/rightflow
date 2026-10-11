@@ -229,6 +229,77 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Command: Toggle Chat RTL Mode
+  const toggleChatCmd = vscode.commands.registerCommand(
+    'rightflow.toggleChatRtl',
+    async () => {
+      const installations = await findIdeInstallations();
+      if (installations.length === 0) {
+        vscode.window.showWarningMessage(
+          'RightFlow: Could not locate IDE installation directory.'
+        );
+        return;
+      }
+
+      const status = await checkStatus(installations[0]);
+      if (status.isInstalled) {
+        const choice = await vscode.window.showQuickPick(
+          [
+            {
+              label: '$(sync) Deactivate RTL Suite',
+              description: 'Restore original workbench.html and remove patches',
+              action: 'deactivate',
+            },
+            {
+              label: '$(refresh) Re-inject & Update Assets',
+              description: 'Refresh rightflow.css and rightflow.js in workbench',
+              action: 'restart',
+            },
+            {
+              label: '$(gear) Configure Arabic Typography',
+              description: 'Setup fonts for Markdown, Plans, and Editor',
+              action: 'fonts',
+            },
+            {
+              label: '$(menu) Open Control Menu',
+              description: 'View full RightFlow diagnostic and control options',
+              action: 'menu',
+            },
+          ],
+          {
+            placeHolder: 'RightFlow Chat RTL Suite is currently active. Select an action:',
+          }
+        );
+
+        if (choice?.action === 'deactivate') {
+          await vscode.commands.executeCommand('rightflow.deactivate');
+        } else if (choice?.action === 'restart') {
+          await vscode.commands.executeCommand('rightflow.restart');
+        } else if (choice?.action === 'fonts') {
+          await vscode.commands.executeCommand('rightflow.setupFonts');
+        } else if (choice?.action === 'menu') {
+          await vscode.commands.executeCommand('rightflow.toggleMenu');
+        }
+      } else {
+        await vscode.commands.executeCommand('rightflow.activate');
+      }
+    }
+  );
+
+  // Auto-sync configuration updates to injected CSS
+  const configWatcher = vscode.workspace.onDidChangeConfiguration(async (e) => {
+    if (e.affectsConfiguration('rightflow')) {
+      const installations = await findIdeInstallations();
+      for (const inst of installations) {
+        const isInst = await isAlreadyInjected(inst);
+        if (isInst) {
+          await reinjectAssets(inst);
+        }
+      }
+      await updateStatusBarText();
+    }
+  });
+
   // Auto-update assets across extension upgrades
   const prevVersion = context.globalState.get<string>(STORAGE_VERSION_KEY);
   if (prevVersion && prevVersion !== currentVersion) {
@@ -248,7 +319,9 @@ export async function activate(context: vscode.ExtensionContext) {
     menuCmd,
     statusCmd,
     restartCmd,
-    fontsCmd
+    fontsCmd,
+    toggleChatCmd,
+    configWatcher
   );
 
   await updateStatusBarText();
