@@ -125,6 +125,40 @@ export async function injectRtl(
       messages.push(`Patched ${path.basename(installation.workbenchHtmlPath)}`);
       changed = true;
     }
+    // 2b. Modify secondary HTML (Antigravity Jetski Agent Panel) if present
+    if (installation.secondaryHtmlPath) {
+      const secBackup = installation.secondaryHtmlPath + '.bak';
+      if (!(await fileExists(secBackup))) {
+        await fs.copyFile(installation.secondaryHtmlPath, secBackup);
+        messages.push(`Created backup: ${path.basename(secBackup)}`);
+      }
+
+      let secHtml = await fs.readFile(installation.secondaryHtmlPath, 'utf-8');
+      secHtml = secHtml.replace(
+        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
+        ''
+      );
+      secHtml = secHtml.replace(
+        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
+        ''
+      );
+
+      let secChanged = false;
+      if (!secHtml.includes(INJECTED_CSS_FILENAME)) {
+        secHtml = secHtml.replace('</head>', cssTag);
+        secChanged = true;
+      }
+      if (!secHtml.includes(INJECTED_JS_FILENAME)) {
+        secHtml = secHtml.replace('</html>', jsTag);
+        secChanged = true;
+      }
+
+      if (secChanged) {
+        await fs.writeFile(installation.secondaryHtmlPath, secHtml, 'utf-8');
+        messages.push(`Patched ${path.basename(installation.secondaryHtmlPath)}`);
+        changed = true;
+      }
+    }
 
     // 3. Ensure workbenchDir exists and write injected CSS & JS
     await fs.mkdir(installation.workbenchDir, { recursive: true });
@@ -209,6 +243,27 @@ export async function removeRtl(
       );
       await fs.writeFile(installation.workbenchHtmlPath, html, 'utf-8');
       changed = true;
+    }
+    if (installation.secondaryHtmlPath) {
+      const secBackup = installation.secondaryHtmlPath + '.bak';
+      if (await fileExists(secBackup)) {
+        await fs.copyFile(secBackup, installation.secondaryHtmlPath);
+        await fs.unlink(secBackup);
+        messages.push(`Restored ${path.basename(installation.secondaryHtmlPath)}`);
+        changed = true;
+      } else {
+        let secHtml = await fs.readFile(installation.secondaryHtmlPath, 'utf-8');
+        secHtml = secHtml.replace(
+          /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
+          ''
+        );
+        secHtml = secHtml.replace(
+          /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
+          ''
+        );
+        await fs.writeFile(installation.secondaryHtmlPath, secHtml, 'utf-8');
+        changed = true;
+      }
     }
 
     const productBackup = installation.productJsonPath + '.bak';

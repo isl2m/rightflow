@@ -362,13 +362,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         if (!str) return false;
 
         // Strip markdown prefixes: lists (- , * , 1. ), task boxes (- [x], - [ ]), headers (### ), quotes (> )
-        str = str.replace(/^(\s*[-*+]\s+\[[ xX]\]\s*|\s*#{1,6}\s+|\s*>\s*|\s*\d+[\.\)]\s*|\s*[-*+]\s+)/, '');
+        str = str.replace(/^(\\s*[-*+]\\s+\\[[ xX]\\]\\s*|\\s*#{1,6}\\s+|\\s*>\\s*|\\s*\\d+[\\.\\)]\\s*|\\s*[-*+]\\s+)/, '');
         // Strip leading tags: [TAG], [DONE], [INFO], [ERROR], etc.
-        str = str.replace(/^\s*\[[^\]]+\]\s*/, '');
+        str = str.replace(/^\\s*\\[[^\\]]+\\]\\s*/, '');
         // Strip leading inline code tokens
-        str = str.replace(/^\s*\x60[^\x60]+\x60\s*/, '');
+        str = str.replace(/^\\s*\\x60[^\\x60]+\\x60\\s*/, '');
         // Strip leading bold markers: **Note:** or **ملاحظة:**
-        str = str.replace(/^\s*\*\*[^*]+\*\*\s*[:\-]?\s*/, '');
+        str = str.replace(/^\\s*\\*\\*[^*]+\\*\\*\\s*[:\\-]?\\s*/, '');
         str = str.trim();
         if (!str) return false;
 
@@ -620,8 +620,10 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         if (document.getElementById(BTN_ID)) return;
 
         // 1. Antigravity IDE new conversation button
-        var anchor = document.querySelector('a[data-tooltip-id="new-conversation-tooltip"]') ||
-                     document.querySelector('[data-testid="new-conversation-button"]');
+        var anchor = document.querySelector('[data-tooltip-id="new-conversation-tooltip"]') ||
+                     document.querySelector('a[data-tooltip-id="new-conversation-tooltip"]') ||
+                     document.querySelector('[data-testid="new-conversation-button"]') ||
+                     document.querySelector('[data-tooltip-id="history-tooltip"]');
 
         var container = null;
         var insertBeforeNode = null;

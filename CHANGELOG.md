@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.14] - 2026-10-11
+
+### Fixed
+- **JavaScript Regex Escaping Fix:** Resolved string escaping in `isRtlText` regular expressions within injected bundle, preventing runtime SyntaxError and restoring the Chat and Editor RTL toggle buttons.
+- **Dual-HTML Workbench Injection:** Extended patch pipeline to target both `workbench.html` and Antigravity IDE Agent frame (`workbench-jetski-agent.html`) ensuring persistent header docking across all agent sessions.
+
+---
+
 ## [1.0.13] - 2026-10-11
 
 ### Added
