@@ -2,7 +2,7 @@
 
   <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/icon.png" width="128" alt="RightFlow Logo" />
 
-  # RightFlow
+  <h1>RightFlow</h1>
   
   **Universal BiDi and RTL Engine for AI Coding IDEs and Agents**  
   *High-performance right-to-left alignment for Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, and Monaco Editor.*
