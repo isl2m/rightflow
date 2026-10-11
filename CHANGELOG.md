@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.12] - 2026-10-11
+
+### Fixed
+- **Title and Logo Alignment:** Refactored header markup to HTML `<h1>` to eliminate automatic markdown anchor offsets, achieving pixel-perfect centering with the logo.
+- **Open VSX Registry Asset Stabilization:** Ensured high-resolution logo and badge visibility across Open VSX and external marketplaces.
+
+---
+
 ## [1.0.10] - 2026-10-11
 
 ### Fixed
