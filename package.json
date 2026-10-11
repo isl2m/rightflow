@@ -2,7 +2,7 @@
   "name": "rightflow",
   "displayName": "RightFlow - Universal RTL and Arabic Engine for AI IDEs",
   "description": "Universal Arabic, Hebrew and Persian RTL and BiDi engine for AI Coding IDEs and Agents: Antigravity IDE, Cursor, VS Code Copilot, Windsurf, Chat, Prompt Input, Plan files, Work/Tasks, Markdown, and Monaco Editor.",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "publisher": "isl2m",
   "author": "Islam Fathy",
   "license": "MIT",
@@ -172,7 +172,8 @@
     "build": "node esbuild.mjs --production",
     "watch": "node esbuild.mjs --watch",
     "compile": "node esbuild.mjs",
-    "package": "npx @vscode/vsce package --no-dependencies"
+    "package": "npx @vscode/vsce package --no-dependencies",
+    "vscode:uninstall": "node ./scripts/unpatch.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

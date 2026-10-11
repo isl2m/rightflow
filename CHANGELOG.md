@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.15] - 2026-10-11
+
+### Added
+- **Automated Lifecycle Uninstall Hook (`vscode:uninstall`):** Integrated standard VS Code uninstallation hook to automatically trigger clean workbench restoration whenever the extension is uninstalled via the Extensions panel.
+- **Universal Multi-IDE Workbench Cleanup:** Enhanced `unpatch.mjs` to auto-detect and safely clean core workbench files and backup artifacts across Antigravity IDE, Cursor, VS Code, and Windsurf.
+
+### Fixed
+- **Residual Tag Stripping:** Ensured all injected `<script>` and `<link>` tags are purged during unpatching, even if IDE backup files originally contained pre-existing injection tags.
+
+---
+
 ## [1.0.14] - 2026-10-11
 
 ### Fixed

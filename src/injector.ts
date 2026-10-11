@@ -231,19 +231,24 @@ export async function removeRtl(
       await fs.unlink(htmlBackup);
       messages.push(`Restored ${path.basename(installation.workbenchHtmlPath)}`);
       changed = true;
-    } else {
-      let html = await fs.readFile(installation.workbenchHtmlPath, 'utf-8');
-      html = html.replace(
+    }
+    let html = await fs.readFile(installation.workbenchHtmlPath, 'utf-8');
+    const cleanedHtml = html
+      .replace(
         /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
         ''
-      );
-      html = html.replace(
+      )
+      .replace(
         /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
         ''
-      );
-      await fs.writeFile(installation.workbenchHtmlPath, html, 'utf-8');
+      )
+      .replace(/\s*<link rel="stylesheet"[^>]*rightflow\.css[^>]*>/gi, '')
+      .replace(/\s*<script[^>]*rightflow\.js[^>]*><\/script>/gi, '');
+    if (cleanedHtml !== html) {
+      await fs.writeFile(installation.workbenchHtmlPath, cleanedHtml, 'utf-8');
       changed = true;
     }
+
     if (installation.secondaryHtmlPath) {
       const secBackup = installation.secondaryHtmlPath + '.bak';
       if (await fileExists(secBackup)) {
@@ -251,17 +256,21 @@ export async function removeRtl(
         await fs.unlink(secBackup);
         messages.push(`Restored ${path.basename(installation.secondaryHtmlPath)}`);
         changed = true;
-      } else {
-        let secHtml = await fs.readFile(installation.secondaryHtmlPath, 'utf-8');
-        secHtml = secHtml.replace(
+      }
+      let secHtml = await fs.readFile(installation.secondaryHtmlPath, 'utf-8');
+      const cleanedSec = secHtml
+        .replace(
           /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
           ''
-        );
-        secHtml = secHtml.replace(
+        )
+        .replace(
           /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
           ''
-        );
-        await fs.writeFile(installation.secondaryHtmlPath, secHtml, 'utf-8');
+        )
+        .replace(/\s*<link rel="stylesheet"[^>]*rightflow\.css[^>]*>/gi, '')
+        .replace(/\s*<script[^>]*rightflow\.js[^>]*><\/script>/gi, '');
+      if (cleanedSec !== secHtml) {
+        await fs.writeFile(installation.secondaryHtmlPath, cleanedSec, 'utf-8');
         changed = true;
       }
     }
