@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/icon.png" width="128" height="128" alt="RightFlow Logo" style="border-radius: 28px;" />
+  <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/icon.png" width="128" alt="RightFlow Logo" />
 
   # RightFlow
   
