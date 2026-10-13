@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.18] - 2026-10-13
+
+### Added
+- **Smart Mixed BiDi Sentence Detection:** Enhanced linguistic heuristic in core BiDi engines (`content.ts` and `markdown-rtl.js`) to accurately detect Arabic sentences beginning with English technical terms (e.g., `RightFlow`, `Docker`, `TypeScript`, `API`, `Git`), preventing false-negative LTR styling.
+- **Full Table RTL & Column Flow Mirroring:** Enabled complete RTL layout on `<table>` elements and cells (`th`, `td`) in Markdown previews and AI Planning/Artifact documents (`*.plan.md`), ensuring columns properly order from right to left with mirrored borders and padding.
+- **Pixel-Perfect Authentic Visual Showcase:** Replaced documentation banners with authentic, 1:1 pixel-perfect side-by-side IDE comparison (`media/before-after.png`) and high-resolution native UI preview (`media/preview.png`).
+
+### Fixed
+- **Mixed Content Direction Flaw:** Resolved edge case where sentences with leading Latin characters defaulted to left-to-right alignment despite majority Arabic content.
+- **Markdown & Plan Table Column Inversion:** Resolved reversed column orientation in Markdown tables by applying `dir="rtl"` and `.rtl-block` directly to container tables.
+
+---
+
 ## [1.0.17] - 2026-10-11
 
 ### Added
