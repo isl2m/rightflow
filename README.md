@@ -51,6 +51,10 @@ When working with Arabic, Hebrew, or Persian in AI-assisted development environm
 
 ## Comparison: Why RightFlow?
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/media/before-after.jpg" alt="RightFlow Before vs After Comparison" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 20px;" />
+</div>
+
 | Feature | Default IDE / Legacy Tools | **RightFlow** |
 | :--- | :--- | :--- |
 | **Agent Chat and Thoughts** | LTR only or broken inline code | **Native BiDi** — Arabic flows RTL, English/code stays LTR |
