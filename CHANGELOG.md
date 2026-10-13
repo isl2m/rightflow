@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.19] - 2026-10-13
+
+### Added
+- **Multi-OS Automated CI Matrix:** Added GitHub Actions CI pipeline running test suites across Ubuntu (`ubuntu-latest`), Windows (`windows-latest`), and macOS (`macos-latest`).
+- **Comprehensive Automated Test Suite (`node --test`):**
+  - **BiDi Engine Test (`test/bidi.test.mjs`):** Validated mixed English/Arabic technical phrases, multi-line prompts, pure LTR code strings, and punctuation heuristics.
+  - **Cross-Platform Candidate Test (`test/cross-platform.test.mjs`):** Verified workbench root path resolution for Windows, macOS, and Linux across VS Code, Cursor, Windsurf, and Antigravity IDE.
+  - **Patch Lifecycle Test (`test/patch-lifecycle.test.mjs`):** End-to-end simulation of patching, idempotence, checksum/backup validation, and unpatch clean restoration.
+- **Cross-Platform Hardening in Standalone Scripts:** Centralized installation root candidates in `scripts/common.mjs`, supporting `electron-sandbox` and `electron-browser` workbench paths, and non-destructive asset deployment.
+- **Linux Permission Diagnostics:** Enhanced permission error handling on Linux with auto-detected IDE directory and one-click copyable permission fix command.
+
+---
+
 ## [1.0.18] - 2026-10-13
 
 ### Added
