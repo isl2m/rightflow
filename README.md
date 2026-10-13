@@ -8,7 +8,11 @@
   *High-performance right-to-left alignment for Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, and Monaco Editor.*
 
   [![Version](https://img.shields.io/github/v/release/isl2m/rightflow?style=flat-square&color=blue&label=version)](https://github.com/isl2m/rightflow/releases)
-  [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&color=purple)](https://open-vsx.org/extension/isl2m/rightflow)
+  [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/isl2m.rightflow?style=flat-square&color=007ACC&label=VS%20Code%20Marketplace&logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=isl2m.rightflow)
+  [![Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/isl2m.rightflow?style=flat-square&color=blue)](https://marketplace.visualstudio.com/items?itemName=isl2m.rightflow)
+  [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&color=purple&logo=eclipseide&logoColor=white)](https://open-vsx.org/extension/isl2m/rightflow)
+  [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/isl2m/rightflow?style=flat-square&color=success&label=open--vsx%20downloads)](https://open-vsx.org/extension/isl2m/rightflow)
+  [![Open VSX Rating](https://img.shields.io/open-vsx/rating/isl2m/rightflow?style=flat-square&color=goldenrod&label=rating)](https://open-vsx.org/extension/isl2m/rightflow)
   [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/isl2m/rightflow/blob/main/LICENSE)
   [![Universal Agents](https://img.shields.io/badge/Agents-Antigravity%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Cascade-orange.svg?style=flat-square)](#supported-ides--ai-agents)
   [![Antigravity IDE](https://img.shields.io/badge/Antigravity%20IDE-v1.90+-indigo.svg?style=flat-square)](https://antigravity.google)
