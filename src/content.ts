@@ -373,18 +373,28 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         if (!str) return false;
 
         // Scan characters for first strong directional letter
+        var firstIsRtl = null;
         for (var i = 0; i < str.length; i++) {
             var ch = str.charAt(i);
-            if (RTL_REGEX.test(ch)) return true;
-            if (LTR_REGEX.test(ch)) return false;
+            if (RTL_REGEX.test(ch)) { firstIsRtl = true; break; }
+            if (LTR_REGEX.test(ch)) { firstIsRtl = false; break; }
         }
 
-        // Fallback: character count ratio if mixed without clear first strong
+        // If it starts with Arabic, it is strictly RTL
+        if (firstIsRtl === true) {
+            return true;
+        }
+
+        // If it starts with English (e.g. "RightFlow هو محرك...", "Docker هي أداة..."):
+        // Count Arabic vs English letters to support mixed technical sentences.
         var rtlMatches = str.match(new RegExp(RTL_REGEX.source, 'g'));
-        var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
         var rtlCount = rtlMatches ? rtlMatches.length : 0;
+        if (rtlCount === 0) return false;
+
+        var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
         var ltrCount = ltrMatches ? ltrMatches.length : 0;
-        return (rtlCount > 0 && rtlCount >= (ltrCount * 0.35));
+
+        return (rtlCount >= 5 && (rtlCount >= ltrCount * 0.3 || rtlCount >= 8));
     }
 
     // Immediately restore saved chat state on startup
@@ -445,8 +455,12 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             '.antigravity-agent-side-panel .select-text table',
             '[data-testid*="artifact"] .select-text p',
             '[data-testid*="artifact"] .select-text li',
+            '[data-testid*="artifact"] .select-text table',
+            '[data-testid*="artifact"] table',
             '[data-testid*="plan"] .select-text p',
             '[data-testid*="plan"] .select-text li',
+            '[data-testid*="plan"] .select-text table',
+            '[data-testid*="plan"] table',
             '.artifact-viewer p',
             '.artifact-viewer li',
             '.artifact-content p',

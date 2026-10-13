@@ -31,21 +31,29 @@
     if (!str) return false;
 
     // Scan characters for first strong directional letter
+    var firstIsRtl = null;
     for (var i = 0; i < str.length; i++) {
       var ch = str.charAt(i);
-      if (RTL_REGEX.test(ch)) return true;
-      if (LTR_REGEX.test(ch)) return false;
+      if (RTL_REGEX.test(ch)) { firstIsRtl = true; break; }
+      if (LTR_REGEX.test(ch)) { firstIsRtl = false; break; }
     }
 
+    if (firstIsRtl === true) {
+      return true;
+    }
+
+    // Support mixed technical sentences starting with English words
     var rtlMatches = str.match(new RegExp(RTL_REGEX.source, 'g'));
-    var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
     var rtlCount = rtlMatches ? rtlMatches.length : 0;
+    if (rtlCount === 0) return false;
+
+    var ltrMatches = str.match(new RegExp(LTR_REGEX.source, 'g'));
     var ltrCount = ltrMatches ? ltrMatches.length : 0;
-    return (rtlCount > 0 && rtlCount >= (ltrCount * 0.35));
+    return (rtlCount >= 5 && (rtlCount >= ltrCount * 0.3 || rtlCount >= 8));
   }
 
   function applyRtlToBlocks() {
-    var selectors = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, th, td, .markdown-alert';
+    var selectors = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, table, th, td, .markdown-alert';
     var blocks = document.querySelectorAll(selectors);
 
     blocks.forEach(function (el) {

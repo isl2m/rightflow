@@ -106,10 +106,11 @@ ol.rtl-block {
   transform: translateY(1px) !important;
 }
 
-/* Tables in RTL */
+/* Tables in RTL - Flips entire column flow & cell alignments */
 .rtl-block table,
 [dir="rtl"] table,
-table.rtl-block {
+table.rtl-block,
+table[dir="rtl"] {
   direction: rtl !important;
   text-align: right !important;
   border-collapse: collapse !important;
@@ -119,7 +120,11 @@ table.rtl-block {
 .rtl-block th,
 .rtl-block td,
 [dir="rtl"] th,
-[dir="rtl"] td {
+[dir="rtl"] td,
+table.rtl-block th,
+table.rtl-block td,
+table[dir="rtl"] th,
+table[dir="rtl"] td {
   text-align: right !important;
   padding: 0.5rem 0.75rem !important;
 }
