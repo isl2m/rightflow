@@ -1,34 +1,15 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { fileExists, getCandidateRoots } from './common.mjs';
 
-async function fileExists(p) {
-  try {
-    await fs.access(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-const localAppData = process.env.LOCALAPPDATA || path.join(process.env.USERPROFILE || '', 'AppData', 'Local');
-const programFiles = process.env.ProgramFiles || 'C:\\Program Files';
-
-const candidateRoots = [
-  process.env.ANTIGRAVITY_APP_ROOT,
-  process.env.VSCODE_APP_ROOT,
-  path.join(localAppData, 'Programs', 'Antigravity IDE', 'resources', 'app'),
-  path.join(localAppData, 'Programs', 'cursor', 'resources', 'app'),
-  path.join(localAppData, 'Programs', 'Microsoft VS Code', 'resources', 'app'),
-  path.join(programFiles, 'Microsoft VS Code', 'resources', 'app'),
-  path.join(localAppData, 'Programs', 'Windsurf', 'resources', 'app'),
-].filter(Boolean);
+const candidateRoots = getCandidateRoots();
 
 const subdirs = ['electron-browser', 'electron-sandbox'];
 const cssFilenames = ['rightflow.css', 'antigravity-rtl-pro.css'];
 const jsFilenames = ['rightflow.js', 'antigravity-rtl-pro.js'];
 
-async function cleanHtmlFile(filePath) {
-  if (!(await fileExists(filePath))) return;
+export async function cleanHtmlFile(filePath) {
+  if (!(await fileExists(filePath))) return false;
 
   const backupPath = filePath + '.bak';
   if (await fileExists(backupPath)) {
@@ -52,55 +33,74 @@ async function cleanHtmlFile(filePath) {
   if (cleaned !== html) {
     await fs.writeFile(filePath, cleaned, 'utf-8');
     console.log(`Cleaned all residual RTL tags from ${path.basename(filePath)}.`);
+    return true;
   }
+  return false;
 }
 
-async function run() {
+export async function unpatchWorkbench(appRoot) {
+  if (!(await fileExists(appRoot))) return false;
+
+  const workbenchDir = path.join(appRoot, 'out', 'vs', 'workbench');
+  const productJsonPath = path.join(appRoot, 'product.json');
+  let touched = false;
+
+  // Clean HTML files
+  for (const subdir of subdirs) {
+    const wbPath = path.join(appRoot, 'out', 'vs', 'code', subdir, 'workbench', 'workbench.html');
+    const secPath = path.join(appRoot, 'out', 'vs', 'code', subdir, 'workbench', 'workbench-jetski-agent.html');
+
+    if (await cleanHtmlFile(wbPath)) touched = true;
+    if (await cleanHtmlFile(secPath)) touched = true;
+  }
+
+  // Remove injected JS and CSS files
+  for (const c of cssFilenames) {
+    try {
+      await fs.unlink(path.join(workbenchDir, c));
+      console.log(`Deleted ${c} from ${workbenchDir}`);
+      touched = true;
+    } catch (e) {}
+  }
+  for (const j of jsFilenames) {
+    try {
+      await fs.unlink(path.join(workbenchDir, j));
+      console.log(`Deleted ${j} from ${workbenchDir}`);
+      touched = true;
+    } catch (e) {}
+  }
+
+  // Restore product.json if backup exists
+  const prodBackup = productJsonPath + '.bak';
+  if (await fileExists(prodBackup)) {
+    try {
+      await fs.copyFile(prodBackup, productJsonPath);
+      await fs.unlink(prodBackup);
+      console.log('Restored product.json from backup.');
+      touched = true;
+    } catch (e) {}
+  }
+
+  return touched;
+}
+
+export async function run() {
   console.log('Restoring IDE workbench to original state...');
 
+  let anyRestored = false;
   for (const appRoot of candidateRoots) {
-    if (!(await fileExists(appRoot))) continue;
-
-    const workbenchDir = path.join(appRoot, 'out', 'vs', 'workbench');
-    const productJsonPath = path.join(appRoot, 'product.json');
-
-    // Clean HTML files
-    for (const subdir of subdirs) {
-      const wbPath = path.join(appRoot, 'out', 'vs', 'code', subdir, 'workbench', 'workbench.html');
-      const secPath = path.join(appRoot, 'out', 'vs', 'code', subdir, 'workbench', 'workbench-jetski-agent.html');
-
-      await cleanHtmlFile(wbPath);
-      await cleanHtmlFile(secPath);
-    }
-
-    // Remove injected JS and CSS files
-    for (const c of cssFilenames) {
-      try {
-        await fs.unlink(path.join(workbenchDir, c));
-        console.log(`Deleted ${c} from ${workbenchDir}`);
-      } catch (e) {}
-    }
-    for (const j of jsFilenames) {
-      try {
-        await fs.unlink(path.join(workbenchDir, j));
-        console.log(`Deleted ${j} from ${workbenchDir}`);
-      } catch (e) {}
-    }
-
-    // Restore product.json if backup exists
-    const prodBackup = productJsonPath + '.bak';
-    if (await fileExists(prodBackup)) {
-      try {
-        await fs.copyFile(prodBackup, productJsonPath);
-        await fs.unlink(prodBackup);
-        console.log('Restored product.json from backup.');
-      } catch (e) {}
+    if (await unpatchWorkbench(appRoot)) {
+      anyRestored = true;
     }
   }
 
   console.log('IDE workbench restore completed successfully.');
+  return anyRestored;
 }
 
-run().catch((err) => {
-  console.error('Error during unpatch:', err);
-});
+// Only auto-run if executed directly as a script
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.filename || '')) {
+  run().catch((err) => {
+    console.error('Error during unpatch:', err);
+  });
+}

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { findIdeInstallations } from './finder';
 import {
   injectRtl,
@@ -63,6 +64,20 @@ async function handlePermissionError(workbenchPath: string) {
       await vscode.env.clipboard.writeText(fixCmd);
       vscode.window.showInformationMessage(
         'Command copied! Paste it in Terminal, then re-activate.'
+      );
+    }
+  } else if (process.platform === 'linux') {
+    const appDir = vscode.env.appRoot || path.dirname(workbenchPath);
+    const fixCmd = `sudo chown -R $(whoami) "${appDir}"`;
+
+    const choice = await vscode.window.showErrorMessage(
+      `RightFlow: Permission denied to patch ${ideName}. Run fix command in Terminal:`,
+      'Copy Fix Command'
+    );
+    if (choice === 'Copy Fix Command') {
+      await vscode.env.clipboard.writeText(fixCmd);
+      vscode.window.showInformationMessage(
+        'Command copied! Paste it in Terminal, then re-activate RightFlow.'
       );
     }
   } else {

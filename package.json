@@ -173,7 +173,8 @@
     "watch": "node esbuild.mjs --watch",
     "compile": "node esbuild.mjs",
     "package": "npx @vscode/vsce package --no-dependencies",
-    "vscode:uninstall": "node ./scripts/unpatch.mjs"
+    "vscode:uninstall": "node ./scripts/unpatch.mjs",
+    "test": "node --test test/**/*.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

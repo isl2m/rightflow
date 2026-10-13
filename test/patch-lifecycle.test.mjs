@@ -1,0 +1,69 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as os from 'os';
+import { patchWorkbench } from '../scripts/patch.mjs';
+import { unpatchWorkbench } from '../scripts/unpatch.mjs';
+
+test('Patch Lifecycle: Full Mock Workbench Patch & Unpatch', async (t) => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rightflow-test-'));
+  const appRoot = path.join(tempDir, 'resources', 'app');
+  const subdir = 'electron-sandbox';
+  const wbDir = path.join(appRoot, 'out', 'vs', 'code', subdir, 'workbench');
+  const productJsonPath = path.join(appRoot, 'product.json');
+
+  await fs.mkdir(wbDir, { recursive: true });
+
+  const originalHtml = '<!DOCTYPE html>\n<html>\n<head>\n\t<title>VS Code</title>\n</head>\n<body>\n\t<div id="workbench"></div>\n</body>\n</html>';
+  const wbHtmlPath = path.join(wbDir, 'workbench.html');
+  await fs.writeFile(wbHtmlPath, originalHtml, 'utf-8');
+
+  const initialProduct = {
+    checksums: {
+      [`vs/code/${subdir}/workbench/workbench.html`]: 'ORIGINAL_CHECKSUM_HASH'
+    }
+  };
+  await fs.writeFile(productJsonPath, JSON.stringify(initialProduct, null, '\t'), 'utf-8');
+
+  // STEP 1: Apply Patch
+  const patched = await patchWorkbench(appRoot);
+  assert.equal(patched, true, 'patchWorkbench should return true when applying patch');
+
+  // Verify backup exists
+  const backupExists = await fs.access(wbHtmlPath + '.bak').then(() => true).catch(() => false);
+  assert.equal(backupExists, true, 'Backup file workbench.html.bak must be created');
+
+  // Verify patched HTML contains RightFlow tags
+  const patchedContent = await fs.readFile(wbHtmlPath, 'utf-8');
+  assert.ok(patchedContent.includes('rightflow.css'), 'Patched HTML must include rightflow.css');
+  assert.ok(patchedContent.includes('rightflow.js'), 'Patched HTML must include rightflow.js');
+
+  // Verify product.json checksum was stripped
+  const updatedProduct = JSON.parse(await fs.readFile(productJsonPath, 'utf-8'));
+  assert.equal(updatedProduct.checksums[`vs/code/${subdir}/workbench/workbench.html`], undefined, 'Checksum must be stripped to prevent corrupt installation notice');
+
+  // STEP 2: Idempotency (running patch again should not duplicate tags)
+  const patchedAgain = await patchWorkbench(appRoot);
+  assert.equal(patchedAgain, false, 'patchWorkbench should return false if already patched');
+  const patchedTwiceContent = await fs.readFile(wbHtmlPath, 'utf-8');
+  const cssMatches = patchedTwiceContent.match(/rightflow\.css/g) || [];
+  assert.equal(cssMatches.length, 1, 'rightflow.css must only be linked once');
+
+  // STEP 3: Unpatch
+  const unpatched = await unpatchWorkbench(appRoot);
+  assert.equal(unpatched, true, 'unpatchWorkbench should return true when restoring');
+
+  // Verify workbench.html restored to original content
+  const restoredContent = await fs.readFile(wbHtmlPath, 'utf-8');
+  assert.ok(!restoredContent.includes('rightflow.css'), 'Restored HTML must not contain rightflow.css');
+  assert.ok(!restoredContent.includes('rightflow.js'), 'Restored HTML must not contain rightflow.js');
+  assert.equal(restoredContent.trim(), originalHtml.trim(), 'Restored HTML must match original HTML');
+
+  // Verify backup file was deleted
+  const backupStillExists = await fs.access(wbHtmlPath + '.bak').then(() => true).catch(() => false);
+  assert.equal(backupStillExists, false, 'Backup file should be cleaned up after successful unpatch');
+
+  // Clean up test directory
+  await fs.rm(tempDir, { recursive: true, force: true });
+});
