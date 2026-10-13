@@ -22,7 +22,7 @@
 ---
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/media/preview.jpg" alt="RightFlow Demo Showcase" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);" />
+  <img src="https://raw.githubusercontent.com/isl2m/rightflow/main/media/preview.png" alt="RightFlow Demo Showcase" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);" />
 </div>
 
 ---
