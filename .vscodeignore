@@ -11,3 +11,6 @@ vsc-extension-quickstart.md
 *.vsix
 *.zip
 temp*/**
+
+RELEASE_WORKFLOW.md
+.agents/**

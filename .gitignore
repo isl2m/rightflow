@@ -17,3 +17,7 @@ Thumbs.db
 *.vsix
 .vscode-test/
 .history/
+
+# Private workflows
+RELEASE_WORKFLOW.md
+.agents/
