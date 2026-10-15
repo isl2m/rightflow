@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.20] - 2026-10-16
+
+### Added
+- **AI Artifacts & Custom Editor RTL Support:** Added native right-to-left layout and BiDi text alignment for Antigravity IDE Artifacts viewer (`.jetski-custom-editor-pane`) and custom editor panes.
+- **Dynamic Tab & Document Polling (`scheduleUpdate`):** Added periodic auto-detection in the background watcher to instantly detect, scan, and render newly opened artifact tabs and switch-views without user interaction.
+- **Markdown Element-Level RTL CSS Enhancements:** Implemented direct element-level selectors (`h1`–`h6`, `ul`, `ol`, `li`, `p`, `table`, `blockquote`) with correct outside list-markers and mirrored callout borders.
+
+### Fixed
+- **Strict LTR Code Isolation in Artifacts:** Ensured preformatted code blocks (`pre`, `code`) and inline code snippets within Arabic Artifact documents remain strictly locked to LTR.
+
+---
+
 ## [1.0.19] - 2026-10-13
 
 ### Added

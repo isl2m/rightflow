@@ -109,7 +109,11 @@ blockquote.antigravity-is-rtl {
 .rightflow-is-rtl ol,
 .antigravity-is-rtl ol,
 [data-rtl="true"] ul,
-[data-rtl="true"] ol {
+[data-rtl="true"] ol,
+ul.rightflow-is-rtl,
+ol.rightflow-is-rtl,
+ul[dir="rtl"],
+ol[dir="rtl"] {
     direction: rtl !important;
     text-align: right !important;
     padding-right: 1.75rem !important;
@@ -120,7 +124,9 @@ blockquote.antigravity-is-rtl {
 
 .rightflow-is-rtl li,
 .antigravity-is-rtl li,
-[data-rtl="true"] li {
+[data-rtl="true"] li,
+li.rightflow-is-rtl,
+li[dir="rtl"] {
     direction: rtl !important;
     text-align: right !important;
 }
@@ -161,7 +167,19 @@ blockquote.antigravity-is-rtl {
 [data-rtl="true"] h1,
 [data-rtl="true"] h2,
 [data-rtl="true"] h3,
-[data-rtl="true"] h4 {
+[data-rtl="true"] h4,
+h1.rightflow-is-rtl,
+h2.rightflow-is-rtl,
+h3.rightflow-is-rtl,
+h4.rightflow-is-rtl,
+h5.rightflow-is-rtl,
+h6.rightflow-is-rtl,
+h1[dir="rtl"],
+h2[dir="rtl"],
+h3[dir="rtl"],
+h4[dir="rtl"],
+h5[dir="rtl"],
+h6[dir="rtl"] {
     direction: rtl !important;
     text-align: right !important;
     font-weight: 700 !important;
@@ -170,7 +188,10 @@ blockquote.antigravity-is-rtl {
 /* Tables in RTL */
 .rightflow-is-rtl table,
 .antigravity-is-rtl table,
-[data-rtl="true"] table {
+[data-rtl="true"] table,
+table.rightflow-is-rtl,
+table.antigravity-is-rtl,
+table[dir="rtl"] {
     direction: rtl !important;
     text-align: right !important;
     border-collapse: collapse !important;
@@ -178,6 +199,16 @@ blockquote.antigravity-is-rtl {
 
 .rightflow-is-rtl th,
 .rightflow-is-rtl td,
+.antigravity-is-rtl th,
+.antigravity-is-rtl td,
+[data-rtl="true"] th,
+[data-rtl="true"] td,
+table.rightflow-is-rtl th,
+table.rightflow-is-rtl td,
+table[dir="rtl"] th,
+table[dir="rtl"] td,
+th.rightflow-is-rtl,
+td.rightflow-is-rtl,
 .antigravity-is-rtl th,
 .antigravity-is-rtl td,
 [data-rtl="true"] th,
@@ -440,7 +471,29 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         var isActive = document.body.classList.contains(BODY_CLASS);
 
         var candidateSelectors = [
-            // 1. Antigravity IDE (Chat, Plans, Work, Artifacts)
+            // 1. Antigravity IDE - Artifact Viewer & Custom Editor Panes (*.artifact, *.plan, markdown artifacts)
+            '.jetski-custom-editor-pane .whitespace-pre-wrap',
+            '.jetski-custom-editor-pane .leading-relaxed.select-text',
+            '.jetski-custom-editor-pane .select-text p',
+            '.jetski-custom-editor-pane .select-text li',
+            '.jetski-custom-editor-pane .select-text ul',
+            '.jetski-custom-editor-pane .select-text ol',
+            '.jetski-custom-editor-pane .select-text table',
+            '.jetski-custom-editor-pane .select-text th',
+            '.jetski-custom-editor-pane .select-text td',
+            '.jetski-custom-editor-pane .select-text h1, .jetski-custom-editor-pane .select-text h2, .jetski-custom-editor-pane .select-text h3, .jetski-custom-editor-pane .select-text h4, .jetski-custom-editor-pane .select-text h5, .jetski-custom-editor-pane .select-text h6',
+            '.jetski-custom-editor-pane .select-text blockquote',
+            '.jetski-custom-editor-pane p',
+            '.jetski-custom-editor-pane li',
+            '.jetski-custom-editor-pane ul',
+            '.jetski-custom-editor-pane ol',
+            '.jetski-custom-editor-pane table',
+            '.jetski-custom-editor-pane th',
+            '.jetski-custom-editor-pane td',
+            '.jetski-custom-editor-pane blockquote',
+            '.jetski-custom-editor-pane h1, .jetski-custom-editor-pane h2, .jetski-custom-editor-pane h3, .jetski-custom-editor-pane h4',
+
+            // 2. Antigravity IDE - Agent Side Panel (Chat, Tasks & Prompts)
             '.antigravity-agent-side-panel .whitespace-pre-wrap',
             '.antigravity-agent-side-panel .leading-relaxed.select-text',
             '.antigravity-agent-side-panel .select-text > p',
@@ -453,13 +506,22 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             '.antigravity-agent-side-panel .select-text > h4',
             '.antigravity-agent-side-panel .select-text > blockquote',
             '.antigravity-agent-side-panel .select-text table',
-            '[data-testid*="artifact"] .select-text p',
-            '[data-testid*="artifact"] .select-text li',
-            '[data-testid*="artifact"] .select-text table',
+
+            // 3. Universal Artifact & Markdown Select-Text (Anywhere in Workbench)
+            '.select-text p',
+            '.select-text li',
+            '.select-text ul',
+            '.select-text ol',
+            '.select-text table',
+            '.select-text th',
+            '.select-text td',
+            '.select-text blockquote',
+            '.select-text h1, .select-text h2, .select-text h3, .select-text h4, .select-text h5, .select-text h6',
+            '[data-testid*="artifact"] p',
+            '[data-testid*="artifact"] li',
             '[data-testid*="artifact"] table',
-            '[data-testid*="plan"] .select-text p',
-            '[data-testid*="plan"] .select-text li',
-            '[data-testid*="plan"] .select-text table',
+            '[data-testid*="plan"] p',
+            '[data-testid*="plan"] li',
             '[data-testid*="plan"] table',
             '.artifact-viewer p',
             '.artifact-viewer li',
@@ -834,6 +896,7 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     setInterval(function() {
         tryInsertEditorButtons();
         updateEditorContainers();
+        scheduleUpdate();
     }, 1000);
 
     window.__rightflow = {
