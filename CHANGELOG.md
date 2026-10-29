@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.21] - 2026-10-29
+
+### Fixed
+- **Antigravity IDE Webview Chat Architecture Support:** Fixed chat compatibility with the latest Antigravity IDE architecture update, which migrated the Chat panel into an isolated webview iframe served via `agy --hub`.
+- **Transparent Local Webview Proxy:** Implemented a non-intrusive, zero-overhead local streaming proxy for Antigravity's chat webview in `extensions/agy/vscode/extension.js` that seamlessly injects RightFlow assets directly into the chat DOM without cross-origin boundary restrictions.
+- **Enhanced Chat Toolbar & Message Selectors:** Added native hooks for `[data-testid="extension-new-conversation"]`, `[aria-label="New Conversation"]`, `[data-testid="conversation-view"]`, and `[data-turn-content]`, ensuring the RightFlow toggle button renders reliably beside the chat toolbar and flips conversation messages smoothly.
+
+---
+
 ## [1.0.20] - 2026-10-16
 
 ### Added

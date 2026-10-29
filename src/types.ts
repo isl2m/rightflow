@@ -8,6 +8,7 @@ export interface IdeInstallation {
   checksumKey: string;
   secondaryHtmlPath?: string;
   secondaryChecksumKey?: string;
+  agyExtensionJsPath?: string;
 }
 
 export interface InstallationStatus {

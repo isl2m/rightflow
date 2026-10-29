@@ -286,7 +286,8 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
 
 /* Header Buttons: Sleek Native Icon Buttons */
 #rightflow-toggle-btn,
-#antigravity-rtl-toggle-btn {
+#antigravity-rtl-toggle-btn,
+.rightflow-chat-toggle-btn {
     width: 26px !important;
     height: 26px !important;
     min-width: 26px !important;
@@ -493,7 +494,60 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             '.jetski-custom-editor-pane blockquote',
             '.jetski-custom-editor-pane h1, .jetski-custom-editor-pane h2, .jetski-custom-editor-pane h3, .jetski-custom-editor-pane h4',
 
-            // 2. Antigravity IDE - Agent Side Panel (Chat, Tasks & Prompts)
+            // 2. Antigravity IDE - Agent Chat & Conversation Panel (#conversation, [role="article"], [data-testid="conversation-view"])
+            '[data-testid="conversation-view"] .whitespace-pre-wrap',
+            '[data-testid="conversation-view"] .leading-relaxed',
+            '[data-testid="conversation-view"] .select-text p',
+            '[data-testid="conversation-view"] .select-text li',
+            '[data-testid="conversation-view"] .select-text ul',
+            '[data-testid="conversation-view"] .select-text ol',
+            '[data-testid="conversation-view"] .select-text table',
+            '[data-testid="conversation-view"] .select-text th',
+            '[data-testid="conversation-view"] .select-text td',
+            '[data-testid="conversation-view"] .select-text h1, [data-testid="conversation-view"] .select-text h2, [data-testid="conversation-view"] .select-text h3, [data-testid="conversation-view"] .select-text h4',
+            '[data-testid="conversation-view"] .select-text blockquote',
+            '[data-testid="conversation-view"] p',
+            '[data-testid="conversation-view"] li',
+            '[data-testid="conversation-view"] table',
+            '[data-testid="conversation-view"] blockquote',
+            '[data-turn-content] p',
+            '[data-turn-content] li',
+            '[data-turn-content] .whitespace-pre-wrap',
+            '[data-turn-content] .select-text',
+            '[data-turn-content] table',
+            '[data-turn-content] blockquote',
+            '#conversation .whitespace-pre-wrap',
+            '#conversation .leading-relaxed.select-text',
+            '#conversation .select-text p',
+            '#conversation .select-text li',
+            '#conversation .select-text ul',
+            '#conversation .select-text ol',
+            '#conversation .select-text table',
+            '#conversation .select-text th',
+            '#conversation .select-text td',
+            '#conversation .select-text h1, #conversation .select-text h2, #conversation .select-text h3, #conversation .select-text h4, #conversation .select-text h5, #conversation .select-text h6',
+            '#conversation .select-text blockquote',
+            '#conversation [role="article"] p',
+            '#conversation [role="article"] li',
+            '#conversation [role="article"] ul',
+            '#conversation [role="article"] ol',
+            '#conversation [role="article"] table',
+            '#conversation [role="article"] th',
+            '#conversation [role="article"] td',
+            '#conversation [role="article"] h1, #conversation [role="article"] h2, #conversation [role="article"] h3, #conversation [role="article"] h4',
+            '#conversation [role="article"] blockquote',
+            '#conversation [role="article"] .whitespace-pre-wrap',
+            '#conversation [data-turn-content] p',
+            '#conversation [data-turn-content] li',
+            '[role="region"][aria-label="Agent Conversation"] p',
+            '[role="region"][aria-label="Agent Conversation"] li',
+            '[role="region"][aria-label="Agent Conversation"] .whitespace-pre-wrap',
+            '[role="article"][aria-label="Agent response"] p',
+            '[role="article"][aria-label="Agent response"] li',
+            '[role="article"][aria-label="Agent response"] table',
+            '[role="article"][aria-label="Agent response"] blockquote',
+            '[role="article"][aria-label="User message"] p',
+            '[role="article"][aria-label="User message"] .whitespace-pre-wrap',
             '.antigravity-agent-side-panel .whitespace-pre-wrap',
             '.antigravity-agent-side-panel .leading-relaxed.select-text',
             '.antigravity-agent-side-panel .select-text > p',
@@ -693,21 +747,37 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
      * Adaptively docks into Antigravity, Cursor, Copilot, or Windsurf toolbars!
      */
     function tryInsertChatButton() {
-        if (document.getElementById(BTN_ID)) return;
+        var existingBtn = document.getElementById(BTN_ID);
+        if (existingBtn && existingBtn.isConnected && existingBtn.parentElement) return;
+        if (existingBtn && (!existingBtn.isConnected || !existingBtn.parentElement)) {
+            try { existingBtn.remove(); } catch(e) {}
+        }
 
-        // 1. Antigravity IDE new conversation button
-        var anchor = document.querySelector('[data-tooltip-id="new-conversation-tooltip"]') ||
+        // 1. Antigravity IDE new conversation / chat header buttons
+        var anchor = document.querySelector('[data-testid="extension-new-conversation"]') ||
+                     document.querySelector('[data-testid="app-icon-new-conversation-button"]') ||
+                     document.querySelector('[aria-label="New Conversation"]') ||
+                     document.querySelector('[data-testid="extension-open-in-hub"]') ||
+                     document.querySelector('[data-tooltip-id="new-conversation-tooltip"]') ||
+                     document.querySelector('[data-tooltip-id="history-tooltip"]') ||
+                     document.querySelector('[data-past-conversations-toggle="true"]') ||
+                     document.querySelector('button[data-tooltip-id="new-conversation-tooltip"]') ||
                      document.querySelector('a[data-tooltip-id="new-conversation-tooltip"]') ||
-                     document.querySelector('[data-testid="new-conversation-button"]') ||
-                     document.querySelector('[data-tooltip-id="history-tooltip"]');
+                     document.querySelector('[data-testid="new-conversation-button"]');
 
         var container = null;
         var insertBeforeNode = null;
 
         if (anchor && anchor.parentElement) {
             container = anchor.parentElement;
-            insertBeforeNode = anchor.nextSibling;
+            insertBeforeNode = anchor;
         } else {
+            var antActionGroup = document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-2.px-0\.5') ||
+                                 document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-2');
+            if (antActionGroup) {
+                container = antActionGroup;
+                insertBeforeNode = antActionGroup.firstChild;
+            } else {
             // 2. Cursor IDE chat toolbar
             var cursorToolbar = document.querySelector('.aichat-container .chat-actions') ||
                                 document.querySelector('.composer-header .actions') ||
@@ -892,8 +962,9 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         });
     }
 
-    // Periodic check for tab switches and newly opened editors (lightweight, 1s interval)
+    // Periodic check for tab switches and newly opened editors & chat panels (lightweight, 1s interval)
     setInterval(function() {
+        tryInsertChatButton();
         tryInsertEditorButtons();
         updateEditorContainers();
         scheduleUpdate();

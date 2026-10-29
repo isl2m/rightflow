@@ -48,6 +48,15 @@ export async function findIdeInstallations(): Promise<IdeInstallation[]> {
 
       const hasSecondary = await fileExists(secondaryHtmlPath);
 
+      const agyExtensionJsPath = path.join(
+        appRoot,
+        'extensions',
+        'agy',
+        'vscode',
+        'extension.js'
+      );
+      const hasAgy = await fileExists(agyExtensionJsPath);
+
       results.push({
         ideName: vscode.env.appName || 'AI Code IDE',
         workbenchHtmlPath,
@@ -58,6 +67,7 @@ export async function findIdeInstallations(): Promise<IdeInstallation[]> {
         secondaryChecksumKey: hasSecondary
           ? `vs/code/${subdir}/workbench/workbench-jetski-agent.html`
           : undefined,
+        agyExtensionJsPath: hasAgy ? agyExtensionJsPath : undefined,
       });
 
       return results;
