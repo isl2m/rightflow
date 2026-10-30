@@ -8,7 +8,7 @@
   *High-performance right-to-left alignment for Antigravity IDE, Cursor, GitHub Copilot, Windsurf, Plans, and Monaco Editor.*
 
   [![Version](https://img.shields.io/github/v/release/isl2m/rightflow?style=flat-square&color=blue&label=version)](https://github.com/isl2m/rightflow/releases)
-  [![CI](https://github.com/isl2m/rightflow/actions/workflows/ci.yml/badge.svg)](https://github.com/isl2m/rightflow/actions/workflows/ci.yml)
+  [![CI](https://github.com/isl2m/rightflow/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/isl2m/rightflow/actions/workflows/ci.yml)
   [![VS Code Marketplace](https://badgen.net/vs-marketplace/v/isl2m.rightflow?icon=visualstudio&label=VS%20Code%20Marketplace&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=isl2m.rightflow)
   [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&color=purple&logo=eclipseide&logoColor=white)](https://open-vsx.org/extension/isl2m/rightflow)
   [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/isl2m/rightflow?style=flat-square&color=success&label=open--vsx%20downloads)](https://open-vsx.org/extension/isl2m/rightflow)
