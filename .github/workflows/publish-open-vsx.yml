@@ -23,6 +23,3 @@ jobs:
         run: npx -y @vscode/vsce package --no-dependencies
       - name: Publish to Visual Studio Marketplace
         run: npx -y @vscode/vsce publish --packagePath *.vsix -p ${{ secrets.VSCE_PAT }}
-      - name: Publish to Open VSX
-        run: npx -y ovsx publish *.vsix -p ${{ secrets.OVSX_PAT }} --skip-duplicate --debug
-        continue-on-error: true
