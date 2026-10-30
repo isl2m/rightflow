@@ -11,6 +11,7 @@
   [![CI](https://github.com/isl2m/rightflow/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/isl2m/rightflow/actions/workflows/ci.yml)
   [![VS Code Marketplace](https://vsmarketplacebadges.dev/version-short/isl2m.rightflow.svg?style=flat-square&label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=isl2m.rightflow)
   [![Open VSX](https://img.shields.io/open-vsx/v/isl2m/rightflow?style=flat-square&label=Open%20VSX&color=blue)](https://open-vsx.org/extension/isl2m/rightflow)
+  [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/isl2m/rightflow?style=flat-square&color=purple)](https://open-vsx.org/extension/isl2m/rightflow)
   [![Installs](https://vsmarketplacebadges.dev/installs-short/isl2m.rightflow.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=isl2m.rightflow)
   [![Rating](https://vsmarketplacebadges.dev/rating-star/isl2m.rightflow.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=isl2m.rightflow)
   [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/isl2m/rightflow/blob/main/LICENSE)
