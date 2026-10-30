@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.25] - 2026-10-30
+
+### Fixed
+- **Open VSX Registry Synchronization:** Resolved false-positive WAF rejection on edge CDN during registry upload, ensuring full parity and automated publishing across both Visual Studio Marketplace and Open VSX Registry.
+- **Package Manifest Optimization:** Enhanced `.vscodeignore` to exclude local scratch test files and maintain clean package boundaries.
+
+---
+
 ## [1.0.23] - 2026-10-30
 
 ### Fixed
