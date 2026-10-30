@@ -86,6 +86,20 @@ export async function unpatchWorkbench(appRoot) {
     } catch (e) {}
   }
 
+  // Restore Antigravity agy extension if backup exists
+  const agyPath = path.join(appRoot, 'extensions', 'agy', 'vscode', 'extension.js');
+  const agyBak = agyPath + '.bak';
+  if (await fileExists(agyBak)) {
+    try {
+      await fs.copyFile(agyBak, agyPath);
+      await fs.unlink(agyBak);
+      console.log('Restored original Antigravity agy extension from backup.');
+      touched = true;
+    } catch (e) {
+      console.warn('Could not restore agy extension backup:', e.message);
+    }
+  }
+
   return touched;
 }
 

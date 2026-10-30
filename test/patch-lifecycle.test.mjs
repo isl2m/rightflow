@@ -89,3 +89,30 @@ test('Patch Lifecycle: Content Security Policy & Trusted Types support', async (
   assert.ok(!unpatchRes.html.includes("'allow-duplicates'"), "Unpatched CSP must not contain 'allow-duplicates'");
   assert.ok(unpatchRes.html.includes('google#safe'), 'Unpatched CSP must retain original policies');
 });
+
+test('Patch Lifecycle: Antigravity agy extension cleanup and restore', async (t) => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rightflow-agy-test-'));
+  const appRoot = path.join(tempDir, 'resources', 'app');
+  const agyDir = path.join(appRoot, 'extensions', 'agy', 'vscode');
+  await fs.mkdir(agyDir, { recursive: true });
+
+  const originalContent = 'console.log("clean original agy");';
+  const modifiedContent = 'console.log("corrupted agy with proxy");';
+  const agyJsPath = path.join(agyDir, 'extension.js');
+  const agyBakPath = path.join(agyDir, 'extension.js.bak');
+
+  await fs.writeFile(agyJsPath, modifiedContent, 'utf-8');
+  await fs.writeFile(agyBakPath, originalContent, 'utf-8');
+
+  // Running unpatchWorkbench must restore clean original and remove backup
+  const unpatched = await unpatchWorkbench(appRoot);
+  assert.equal(unpatched, true, 'unpatchWorkbench should report true when restoring agy extension');
+
+  const restored = await fs.readFile(agyJsPath, 'utf-8');
+  assert.equal(restored, originalContent, 'extension.js must be restored to original clean code');
+
+  const bakStillExists = await fs.access(agyBakPath).then(() => true).catch(() => false);
+  assert.equal(bakStillExists, false, 'extension.js.bak must be removed after restoration');
+
+  await fs.rm(tempDir, { recursive: true, force: true });
+});

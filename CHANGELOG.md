@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.23] - 2026-10-30
+
+### Fixed
+- **Antigravity IDE Chat Panel Stability & Self-Healing:** Completely eliminated the experimental in-process proxy injection in `extensions/agy/vscode/extension.js` that caused syntax errors and prevented the chat panel from opening in Antigravity IDE.
+- **Automated Extension Cleanup:** Added self-healing logic across `injectRtl`, `unpatchWorkbench`, and patching scripts to automatically restore clean original backups of `extension.js`, ensuring zero corruption of Antigravity's core AI services.
+- **Robust CSP Trusted Types Matching:** Enhanced CSP regex parsing with lookbehinds (`(?<!require-)(trusted-types\s+)`) to cleanly isolate the `trusted-types` directive and avoid false matches against `require-trusted-types-for`.
+- **Streamlined Release Workflow:** Updated documentation and workflows to reflect the modern asset architecture and deployment guidelines.
+
+---
+
 ## [1.0.22] - 2026-10-30
 
 ### Added

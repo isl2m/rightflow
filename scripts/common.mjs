@@ -12,7 +12,7 @@ export async function fileExists(p) {
 }
 
 export function patchCspTrustedTypes(html) {
-  const ttRegex = /(trusted-types\s+)([^;]+?)(;)/i;
+  const ttRegex = /(?<!require-)(trusted-types\s+)([^;]+?)(;)/i;
   const match = html.match(ttRegex);
   if (!match) {
     return { html, changed: false };
@@ -41,7 +41,7 @@ export function patchCspTrustedTypes(html) {
 }
 
 export function unpatchCspTrustedTypes(html) {
-  const ttRegex = /(trusted-types\s+)([^;]+?)(;)/i;
+  const ttRegex = /(?<!require-)(trusted-types\s+)([^;]+?)(;)/i;
   const match = html.match(ttRegex);
   if (!match) {
     return { html, changed: false };

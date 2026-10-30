@@ -130,118 +130,18 @@ export async function patchWorkbench(appRoot) {
     }
   }
 
-  // Patch Antigravity agy extension for Chat Webview Proxy
+  // Restore Antigravity agy extension if modified or backup exists
   const agyPath = path.join(appRoot, 'extensions', 'agy', 'vscode', 'extension.js');
   if (await fileExists(agyPath)) {
     const agyBak = agyPath + '.bak';
-    if (!(await fileExists(agyBak))) {
-      try { await fs.copyFile(agyPath, agyBak); } catch (e) {}
-    }
-    let agyContent = await fs.readFile(agyPath, 'utf-8');
-    if (!agyContent.includes('__rightflow_proxy')) {
-      const agyTarget = 'renderIframe(a,b,c){var d=this.buildIframeUrl(b,c);console.log(`[Jetski] Loading iframe URL: ${zv(d)}`);this.renderWebviewHtml(a,b,d,c)}';
-      const agyReplacement = 'async renderIframe(a,b,c){var d=this.buildIframeUrl(b,c);console.log(`[Jetski] Loading iframe URL: ${zv(d)}`);\\n' +
-'try{\\n' +
-'  const rf=globalThis.__rightflow_proxy||(globalThis.__rightflow_proxy=(function(){\\n' +
-'    const http=require("http"),net=require("net"),fs=require("fs"),path=require("path");\\n' +
-'    let wbDir=path.resolve(__dirname,"..","..","..","out","vs","workbench");\\n' +
-'    if(!fs.existsSync(path.join(wbDir,"rightflow.js"))){\\n' +
-'      wbDir=path.resolve(__dirname,"..","..","out","vs","workbench");\\n' +
-'    }\\n' +
-'    const rfJsPath=path.join(wbDir,"rightflow.js");\\n' +
-'    const rfCssPath=path.join(wbDir,"rightflow.css");\\n' +
-'    let targetPort=0;\\n' +
-'    let readyCbs=[];\\n' +
-'    const srv=http.createServer((req,res)=>{\\n' +
-'      if(req.url==="/rightflow.css"){\\n' +
-'        try{\\n' +
-'          const css=fs.readFileSync(rfCssPath,"utf8");\\n' +
-'          res.writeHead(200,{"Content-Type":"text/css; charset=utf-8"});\\n' +
-'          res.end(css);return;\\n' +
-'        }catch(e){res.writeHead(500);res.end();return;}\\n' +
-'      }\\n' +
-'      if(req.url==="/rightflow.js"){\\n' +
-'        try{\\n' +
-'          const js=fs.readFileSync(rfJsPath,"utf8");\\n' +
-'          res.writeHead(200,{"Content-Type":"application/javascript; charset=utf-8"});\\n' +
-'          res.end(js);return;\\n' +
-'        }catch(e){res.writeHead(500);res.end();return;}\\n' +
-'      }\\n' +
-'      const isHtml=req.url==="/"||req.url.startsWith("/?");\\n' +
-'      const headers={...req.headers,host:`127.0.0.1:${targetPort}`};\\n' +
-'      if(isHtml)delete headers["accept-encoding"];\\n' +
-'      const opt={hostname:"127.0.0.1",port:targetPort,path:req.url,method:req.method,headers:headers};\\n' +
-'      const proxyReq=http.request(opt,(proxyRes)=>{\\n' +
-'        if(isHtml&&proxyRes.statusCode===200){\\n' +
-'          let body="";proxyRes.setEncoding("utf8");\\n' +
-'          proxyRes.on("data",chunk=>{body+=chunk;});\\n' +
-'          proxyRes.on("end",()=>{\\n' +
-'            let injected=body.replace("</head>","<link rel=\\"stylesheet\\" href=\\"/rightflow.css\\">\\\\n</head>").replace("</body>","<script src=\\"/rightflow.js\\"></script>\\\\n</body>");\\n' +
-'            if(injected.includes("trusted-types")&&!injected.includes("rightflow")){\\n' +
-'              injected=injected.replace(/(trusted-types\\\\s+)([^;]+?)(;)/i,"$1$2 rightflow \'allow-duplicates\'$3");\\n' +
-'            }\\n' +
-'            const resHeaders={...proxyRes.headers};\\n' +
-'            delete resHeaders["content-length"];\\n' +
-'            delete resHeaders["content-encoding"];\\n' +
-'            resHeaders["content-type"]="text/html; charset=utf-8";\\n' +
-'            res.writeHead(proxyRes.statusCode,resHeaders);\\n' +
-'            res.end(injected);\\n' +
-'          });\\n' +
-'        }else{\\n' +
-'          res.writeHead(proxyRes.statusCode,proxyRes.headers);\\n' +
-'          proxyRes.pipe(res);\\n' +
-'        }\\n' +
-'      });\\n' +
-'      proxyReq.on("error",()=>res.writeHead(502).end("Bad Gateway"));\\n' +
-'      req.pipe(proxyReq);\\n' +
-'    });\\n' +
-'    srv.on("upgrade",(req,socket,head)=>{\\n' +
-'      const proxySocket=net.connect(targetPort,"127.0.0.1",()=>{\\n' +
-'        let reqHeaders=`${req.method} ${req.url} HTTP/1.1\\\\r\\\\n`;\\n' +
-'        for(let i=0;i<req.rawHeaders.length;i+=2){\\n' +
-'          let k=req.rawHeaders[i],v=req.rawHeaders[i+1];\\n' +
-'          if(k.toLowerCase()==="host")v=`127.0.0.1:${targetPort}`;\\n' +
-'          reqHeaders+=`${k}: ${v}\\\\r\\\\n`;\\n' +
-'        }\\n' +
-'        reqHeaders+="\\\\r\\\\n";\\n' +
-'        proxySocket.write(reqHeaders);\\n' +
-'        if(head&&head.length)proxySocket.write(head);\\n' +
-'        proxySocket.pipe(socket);socket.pipe(proxySocket);\\n' +
-'      });\\n' +
-'      proxySocket.on("error",()=>socket.destroy());\\n' +
-'      socket.on("error",()=>proxySocket.destroy());\\n' +
-'    });\\n' +
-'    srv.listen(0,"127.0.0.1",()=>{\\n' +
-'      readyCbs.forEach(cb=>cb());\\n' +
-'      readyCbs=[];\\n' +
-'    });\\n' +
-'    return{\\n' +
-'      setTargetPort:p=>{targetPort=p;},\\n' +
-'      getPort:()=>srv.address()?.port,\\n' +
-'      onReady:cb=>{if(srv.address()?.port)cb();else readyCbs.push(cb);}\\n' +
-'    };\\n' +
-'  })());\\n' +
-'  if(!rf.getPort()){\\n' +
-'    await Promise.race([\\n' +
-'      new Promise(r=>rf.onReady(r)),\\n' +
-'      new Promise(r=>setTimeout(r,1000))\\n' +
-'    ]);\\n' +
-'  }\\n' +
-'  const m=b.match(/:(\\\\d+)/);\\n' +
-'  if(m&&rf.getPort()){\\n' +
-'    const hp=parseInt(m[1],10);\\n' +
-'    rf.setTargetPort(hp);\\n' +
-'    const pp=rf.getPort();\\n' +
-'    b=b.replace(":"+hp,":"+pp);\\n' +
-'    d=d.replace(":"+hp,":"+pp);\\n' +
-'  }\\n' +
-'}catch(e){console.error("[RightFlow] Proxy error:",e);}\\n' +
-'this.renderWebviewHtml(a,b,d,c)}';
-      if (agyContent.includes(agyTarget)) {
-        agyContent = agyContent.replace(agyTarget, agyReplacement);
-        await fs.writeFile(agyPath, agyContent, 'utf-8');
-        console.log('Patched Antigravity Chat proxy in ' + agyPath);
+    if (await fileExists(agyBak)) {
+      try {
+        await fs.copyFile(agyBak, agyPath);
+        await fs.unlink(agyBak);
+        console.log('Restored clean Antigravity agy extension from backup');
         touched = true;
+      } catch (e) {
+        console.warn('Could not restore agy extension backup:', e.message);
       }
     }
   }
