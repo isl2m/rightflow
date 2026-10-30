@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.27] - 2026-10-30
+
+### Fixed
+- **Open VSX Fastly WAF Parity:** Resolved edge CDN false-positive signature on compressed archive stream to ensure synchronized releases across Open VSX Registry and Visual Studio Marketplace.
+- **Antigravity Chat Header Toggle Button:** Integrated native docking anchor for `[data-testid="titlebar-more-actions"]` and `[data-testid="pane-titlebar-toolbar"]`, restoring the chat RTL toggle button in Antigravity IDE.
+- **Electron Title Bar Interaction:** Configured `-webkit-app-region: no-drag` and `pointer-events: auto` for responsive clicking in draggable window titlebars.
+- **Instant Body Class Initialization:** Decoupled `rightflow-enabled` body class assignment from header toolbar insertion so RTL styling takes effect immediately on launch.
+- **Enhanced Chat Message & Bubble BiDi:** Added comprehensive selectors for Antigravity user message bubbles (`[data-testid="user-message-bubble"]`, `[data-quotable="true"]`), agent responses (`CustomMarkdown`), and titlebar breadcrumbs (`header span`).
+
+---
+
 ## [1.0.26] - 2026-10-30
 
 ### Fixed
