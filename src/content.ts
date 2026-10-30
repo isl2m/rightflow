@@ -372,6 +372,24 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 (function() {
     'use strict';
 
+    // 1. Initialize RightFlow Trusted Types Policy (for Modern VS Code & Antigravity IDE)
+    var ttPolicy = null;
+    if (typeof window !== 'undefined' && window.trustedTypes && typeof window.trustedTypes.createPolicy === 'function') {
+        try {
+            ttPolicy = window.trustedTypes.createPolicy('rightflow', {
+                createHTML: function(s) { return s; },
+                createScript: function(s) { return s; },
+                createScriptURL: function(s) { return s; }
+            });
+        } catch(e) {
+            try {
+                if (window.trustedTypes.defaultPolicy) {
+                    ttPolicy = window.trustedTypes.defaultPolicy;
+                }
+            } catch(e2) {}
+        }
+    }
+
     var BTN_ID = 'rightflow-toggle-btn';
     var EDITOR_BTN_CLASS = 'rightflow-editor-btn';
     var BODY_CLASS = 'rightflow-enabled';
@@ -808,7 +826,9 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
         var btn = document.createElement('a');
         btn.id = BTN_ID;
-        btn.href = '#';
+        btn.setAttribute('href', '#');
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('tabindex', '0');
         btn.title = 'RightFlow: \u062a\u0628\u062f\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 (RTL / LTR)';
         btn.appendChild(createRtlIconSvg());
 
@@ -832,6 +852,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             btn.classList.toggle('antigravity-rtl-active', active);
             localStorage.setItem(STORAGE_KEY, active ? 'true' : 'false');
             scheduleUpdate();
+        });
+
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                btn.click();
+            }
         });
 
         if (insertBeforeNode) {
@@ -867,6 +894,9 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
 
             var btn = document.createElement('a');
             btn.className = 'action-label ' + EDITOR_BTN_CLASS;
+            btn.setAttribute('href', '#');
+            btn.setAttribute('role', 'button');
+            btn.setAttribute('tabindex', '0');
             btn.title = isForced
                 ? 'RightFlow: \u062a\u0645 \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0644\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)'
                 : 'RightFlow: \u062a\u0641\u0639\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 RTL \u0641\u064a \u0627\u0644\u0645\u062d\u0631\u0631 (Ctrl+Alt+R)';
@@ -880,6 +910,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
                 e.preventDefault();
                 e.stopPropagation();
                 toggleEditorRtl();
+            });
+
+            btn.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
             });
 
             item.appendChild(btn);
@@ -971,6 +1008,7 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     }, 1000);
 
     window.__rightflow = {
+        policy: ttPolicy,
         toggleChat: function(forceState) {
             var active = typeof forceState === 'boolean' 
                 ? forceState 

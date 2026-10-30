@@ -2,7 +2,7 @@
   "name": "rightflow",
   "displayName": "RightFlow - Universal RTL and Arabic Engine for AI IDEs",
   "description": "Universal Arabic, Hebrew and Persian RTL and BiDi engine for AI Coding IDEs and Agents: Antigravity IDE, Cursor, VS Code Copilot, Windsurf, Chat, Prompt Input, Plan files, Work/Tasks, Markdown, and Monaco Editor.",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "publisher": "isl2m",
   "author": "Islam Fathy",
   "license": "MIT",

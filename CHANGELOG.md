@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.22] - 2026-10-30
+
+### Added
+- **Full Browser-Level Trusted Types Compliance:** Fully aligned RightFlow's Deep Injection engine with Chromium and VS Code's modern `require-trusted-types-for 'script'` and `trusted-types` Content Security Policy (CSP) security model.
+- **Dynamic CSP Trusted Types Whitelisting:** Automatically patches `<meta http-equiv="Content-Security-Policy">` in `workbench.html`, `workbench-jetski-agent.html`, and proxied webviews to whitelist `rightflow` and `'allow-duplicates'`, eliminating any security policy rejections.
+- **Dedicated Runtime Policy Creation:** Defensive instantiation of `window.trustedTypes.createPolicy('rightflow', ...)` in the injected runtime with fallback to `defaultPolicy` or native passthrough.
+- **Zero-Sink DOM Safety:** Audited and verified all UI element creations (toolbar buttons, SVGs, toggles) using strict DOM APIs (`createElementNS`, `setAttribute`, `textContent`) with zero raw HTML sinks.
+
+### Removed
+- **Unused Build Artifacts Cleanup:** Removed legacy packaged `.vsix` binaries and temporary diagnostic scripts to keep the repository streamlined and lightweight.
+
+---
+
 ## [1.0.21] - 2026-10-29
 
 ### Fixed

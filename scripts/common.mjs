@@ -11,6 +11,55 @@ export async function fileExists(p) {
   }
 }
 
+export function patchCspTrustedTypes(html) {
+  const ttRegex = /(trusted-types\s+)([^;]+?)(;)/i;
+  const match = html.match(ttRegex);
+  if (!match) {
+    return { html, changed: false };
+  }
+
+  const existingPolicies = match[2];
+  if (/\b\*\b/.test(existingPolicies) || /\brightflow\b/.test(existingPolicies)) {
+    return { html, changed: false };
+  }
+
+  const needsAllowDuplicates = !existingPolicies.includes("'allow-duplicates'");
+  const addition = ` rightflow${needsAllowDuplicates ? " 'allow-duplicates'" : ''}`;
+
+  const trailingWhitespaceMatch = existingPolicies.match(/\s+$/);
+  let updatedPolicies = '';
+  if (trailingWhitespaceMatch) {
+    const trailingWs = trailingWhitespaceMatch[0];
+    const base = existingPolicies.slice(0, -trailingWs.length);
+    updatedPolicies = `${base}${addition}${trailingWs}`;
+  } else {
+    updatedPolicies = `${existingPolicies}${addition}`;
+  }
+
+  const updatedHtml = html.replace(ttRegex, `$1${updatedPolicies}$3`);
+  return { html: updatedHtml, changed: true };
+}
+
+export function unpatchCspTrustedTypes(html) {
+  const ttRegex = /(trusted-types\s+)([^;]+?)(;)/i;
+  const match = html.match(ttRegex);
+  if (!match) {
+    return { html, changed: false };
+  }
+
+  const existingPolicies = match[2];
+  if (!/\brightflow\b/.test(existingPolicies)) {
+    return { html, changed: false };
+  }
+
+  let cleanedPolicies = existingPolicies
+    .replace(/\s*rightflow\b/g, '')
+    .replace(/\s*'allow-duplicates'/g, '');
+
+  const updatedHtml = html.replace(ttRegex, `$1${cleanedPolicies}$3`);
+  return { html: updatedHtml, changed: true };
+}
+
 export function getCandidateRoots(overridePlatform) {
   const home = os.homedir();
   const roots = [];

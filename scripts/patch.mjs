@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { fileExists, getCandidateRoots } from './common.mjs';
+import { fileExists, getCandidateRoots, patchCspTrustedTypes } from './common.mjs';
 
 const subdirs = ['electron-sandbox', 'electron-browser'];
 const cssFilename = 'rightflow.css';
@@ -17,22 +17,36 @@ export async function patchHtml(filePath) {
   }
 
   let html = await fs.readFile(filePath, 'utf-8');
-  if (html.includes(cssFilename) && html.includes(jsFilename)) {
-    return false;
+  const alreadyHasTags = html.includes(cssFilename) && html.includes(jsFilename);
+  if (alreadyHasTags) {
+    const cspRes = patchCspTrustedTypes(html);
+    if (!cspRes.changed) {
+      return false;
+    }
+    await fs.writeFile(filePath, cspRes.html, 'utf-8');
+    console.log(`Patched Trusted Types in ${path.basename(filePath)}`);
+    return true;
   }
+
+  let changed = false;
   html = html.replace(/\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi, '');
   html = html.replace(/\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi, '');
 
   const cssTag = `\t<!-- RightFlow -->\n\t<link rel="stylesheet" href="../../../workbench/${cssFilename}">\n</head>`;
   const jsTag = `\t<!-- RightFlow -->\n\t<script src="../../../workbench/${jsFilename}"></script>\n</html>`;
 
-  let changed = false;
   if (!html.includes(cssFilename)) {
     html = html.replace('</head>', cssTag);
     changed = true;
   }
   if (!html.includes(jsFilename)) {
     html = html.replace('</html>', jsTag);
+    changed = true;
+  }
+
+  const cspRes = patchCspTrustedTypes(html);
+  if (cspRes.changed) {
+    html = cspRes.html;
     changed = true;
   }
 
@@ -162,7 +176,10 @@ export async function patchWorkbench(appRoot) {
 '          let body="";proxyRes.setEncoding("utf8");\\n' +
 '          proxyRes.on("data",chunk=>{body+=chunk;});\\n' +
 '          proxyRes.on("end",()=>{\\n' +
-'            const injected=body.replace("</head>","<link rel=\\"stylesheet\\" href=\\"/rightflow.css\\">\\\\n</head>").replace("</body>","<script src=\\"/rightflow.js\\"></script>\\\\n</body>");\\n' +
+'            let injected=body.replace("</head>","<link rel=\\"stylesheet\\" href=\\"/rightflow.css\\">\\\\n</head>").replace("</body>","<script src=\\"/rightflow.js\\"></script>\\\\n</body>");\\n' +
+'            if(injected.includes("trusted-types")&&!injected.includes("rightflow")){\\n' +
+'              injected=injected.replace(/(trusted-types\\\\s+)([^;]+?)(;)/i,"$1$2 rightflow \'allow-duplicates\'$3");\\n' +
+'            }\\n' +
 '            const resHeaders={...proxyRes.headers};\\n' +
 '            delete resHeaders["content-length"];\\n' +
 '            delete resHeaders["content-encoding"];\\n' +

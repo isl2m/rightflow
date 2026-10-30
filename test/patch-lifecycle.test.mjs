@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { patchWorkbench } from '../scripts/patch.mjs';
 import { unpatchWorkbench } from '../scripts/unpatch.mjs';
+import { patchCspTrustedTypes, unpatchCspTrustedTypes } from '../scripts/common.mjs';
 
 test('Patch Lifecycle: Full Mock Workbench Patch & Unpatch', async (t) => {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rightflow-test-'));
@@ -66,4 +67,25 @@ test('Patch Lifecycle: Full Mock Workbench Patch & Unpatch', async (t) => {
 
   // Clean up test directory
   await fs.rm(tempDir, { recursive: true, force: true });
+});
+
+test('Patch Lifecycle: Content Security Policy & Trusted Types support', async (t) => {
+  const sampleCsp = '<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="default-src \'self\'; require-trusted-types-for \'script\'; trusted-types amdLoader cellRenderer google#safe;"></head><body></body></html>';
+
+  // 1. Test patchCspTrustedTypes
+  const patchRes = patchCspTrustedTypes(sampleCsp);
+  assert.equal(patchRes.changed, true, 'patchCspTrustedTypes should report changed: true');
+  assert.ok(patchRes.html.includes('rightflow'), 'CSP must include rightflow');
+  assert.ok(patchRes.html.includes("'allow-duplicates'"), "CSP must include 'allow-duplicates'");
+
+  // 2. Test idempotency
+  const patchAgain = patchCspTrustedTypes(patchRes.html);
+  assert.equal(patchAgain.changed, false, 'patchCspTrustedTypes must be idempotent');
+
+  // 3. Test unpatchCspTrustedTypes
+  const unpatchRes = unpatchCspTrustedTypes(patchRes.html);
+  assert.equal(unpatchRes.changed, true, 'unpatchCspTrustedTypes should report changed: true');
+  assert.ok(!unpatchRes.html.includes('rightflow'), 'Unpatched CSP must not contain rightflow');
+  assert.ok(!unpatchRes.html.includes("'allow-duplicates'"), "Unpatched CSP must not contain 'allow-duplicates'");
+  assert.ok(unpatchRes.html.includes('google#safe'), 'Unpatched CSP must retain original policies');
 });

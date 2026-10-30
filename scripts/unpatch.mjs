@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { fileExists, getCandidateRoots } from './common.mjs';
+import { fileExists, getCandidateRoots, unpatchCspTrustedTypes } from './common.mjs';
 
 const candidateRoots = getCandidateRoots();
 
@@ -24,11 +24,16 @@ export async function cleanHtmlFile(filePath) {
 
   // Ensure ALL RightFlow / RTL tags are stripped, even if the backup file already contained them
   let html = await fs.readFile(filePath, 'utf-8');
-  const cleaned = html
+  let cleaned = html
     .replace(/\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi, '')
     .replace(/\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi, '')
     .replace(/\s*<link rel="stylesheet"[^>]*rightflow\.css[^>]*>/gi, '')
     .replace(/\s*<script[^>]*rightflow\.js[^>]*><\/script>/gi, '');
+
+  const unpatchCsp = unpatchCspTrustedTypes(cleaned);
+  if (unpatchCsp.changed) {
+    cleaned = unpatchCsp.html;
+  }
 
   if (cleaned !== html) {
     await fs.writeFile(filePath, cleaned, 'utf-8');

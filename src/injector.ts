@@ -35,7 +35,10 @@ export function getAgyProxyCode(): string {
 '          let body="";proxyRes.setEncoding("utf8");\\n' +
 '          proxyRes.on("data",chunk=>{body+=chunk;});\\n' +
 '          proxyRes.on("end",()=>{\\n' +
-'            const injected=body.replace("</head>","<link rel=\\"stylesheet\\" href=\\"/rightflow.css\\">\\\\n</head>").replace("</body>","<script src=\\"/rightflow.js\\"></script>\\\\n</body>");\\n' +
+'            let injected=body.replace("</head>","<link rel=\\"stylesheet\\" href=\\"/rightflow.css\\">\\\\n</head>").replace("</body>","<script src=\\"/rightflow.js\\"></script>\\\\n</body>");\\n' +
+'            if(injected.includes("trusted-types")&&!injected.includes("rightflow")){\\n' +
+'              injected=injected.replace(/(trusted-types\\\\s+)([^;]+?)(;)/i,"$1$2 rightflow \'allow-duplicates\'$3");\\n' +
+'            }\\n' +
 '            const resHeaders={...proxyRes.headers};\\n' +
 '            delete resHeaders["content-length"];\\n' +
 '            delete resHeaders["content-encoding"];\\n' +
@@ -115,6 +118,55 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
+export function patchCspTrustedTypes(html: string): { html: string; changed: boolean } {
+  const ttRegex = /(trusted-types\s+)([^;]+?)(;)/i;
+  const match = html.match(ttRegex);
+  if (!match) {
+    return { html, changed: false };
+  }
+
+  const existingPolicies = match[2];
+  if (/\b\*\b/.test(existingPolicies) || /\brightflow\b/.test(existingPolicies)) {
+    return { html, changed: false };
+  }
+
+  const needsAllowDuplicates = !existingPolicies.includes("'allow-duplicates'");
+  const addition = ` rightflow${needsAllowDuplicates ? " 'allow-duplicates'" : ''}`;
+
+  const trailingWhitespaceMatch = existingPolicies.match(/\s+$/);
+  let updatedPolicies = '';
+  if (trailingWhitespaceMatch) {
+    const trailingWs = trailingWhitespaceMatch[0];
+    const base = existingPolicies.slice(0, -trailingWs.length);
+    updatedPolicies = `${base}${addition}${trailingWs}`;
+  } else {
+    updatedPolicies = `${existingPolicies}${addition}`;
+  }
+
+  const updatedHtml = html.replace(ttRegex, `$1${updatedPolicies}$3`);
+  return { html: updatedHtml, changed: true };
+}
+
+export function unpatchCspTrustedTypes(html: string): { html: string; changed: boolean } {
+  const ttRegex = /(trusted-types\s+)([^;]+?)(;)/i;
+  const match = html.match(ttRegex);
+  if (!match) {
+    return { html, changed: false };
+  }
+
+  const existingPolicies = match[2];
+  if (!/\brightflow\b/.test(existingPolicies)) {
+    return { html, changed: false };
+  }
+
+  let cleanedPolicies = existingPolicies
+    .replace(/\s*rightflow\b/g, '')
+    .replace(/\s*'allow-duplicates'/g, '');
+
+  const updatedHtml = html.replace(ttRegex, `$1${cleanedPolicies}$3`);
+  return { html: updatedHtml, changed: true };
+}
+
 export async function isAlreadyInjected(
   installation: IdeInstallation
 ): Promise<boolean> {
@@ -123,10 +175,10 @@ export async function isAlreadyInjected(
       installation.workbenchHtmlPath,
       'utf-8'
     );
-    return (
-      htmlContent.includes(INJECTED_CSS_FILENAME) &&
-      htmlContent.includes(INJECTED_JS_FILENAME)
-    );
+    const hasCss = htmlContent.includes(INJECTED_CSS_FILENAME);
+    const hasJs = htmlContent.includes(INJECTED_JS_FILENAME);
+    const hasCsp = !htmlContent.includes('trusted-types') || htmlContent.includes('rightflow');
+    return hasCss && hasJs && hasCsp;
   } catch {
     return false;
   }
@@ -193,28 +245,45 @@ export async function injectRtl(
 
     // 2. Modify workbench.html
     let html = await fs.readFile(installation.workbenchHtmlPath, 'utf-8');
-
-    // Clean up any legacy injection from previous versions or other extensions
-    html = html.replace(
-      /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
-      ''
-    );
-    html = html.replace(
-      /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
-      ''
-    );
-
-    const cssTag = `\t<!-- RightFlow -->\n\t<link rel="stylesheet" href="../../../workbench/${INJECTED_CSS_FILENAME}">\n</head>`;
-    const jsTag = `\t<!-- RightFlow -->\n\t<script src="../../../workbench/${INJECTED_JS_FILENAME}"></script>\n</html>`;
-
+    const alreadyHasTags = html.includes(INJECTED_CSS_FILENAME) && html.includes(INJECTED_JS_FILENAME);
     let htmlChanged = false;
-    if (!html.includes(INJECTED_CSS_FILENAME)) {
-      html = html.replace('</head>', cssTag);
-      htmlChanged = true;
-    }
-    if (!html.includes(INJECTED_JS_FILENAME)) {
-      html = html.replace('</html>', jsTag);
-      htmlChanged = true;
+
+    if (alreadyHasTags) {
+      const cspRes = patchCspTrustedTypes(html);
+      if (cspRes.changed) {
+        html = cspRes.html;
+        htmlChanged = true;
+        messages.push('Configured Trusted Types policy whitelist in CSP');
+      }
+    } else {
+      // Clean up any legacy injection from previous versions or other extensions
+      html = html.replace(
+        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
+        ''
+      );
+      html = html.replace(
+        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
+        ''
+      );
+
+      const cssTag = `\t<!-- RightFlow -->\n\t<link rel="stylesheet" href="../../../workbench/${INJECTED_CSS_FILENAME}">\n</head>`;
+      const jsTag = `\t<!-- RightFlow -->\n\t<script src="../../../workbench/${INJECTED_JS_FILENAME}"></script>\n</html>`;
+
+      if (!html.includes(INJECTED_CSS_FILENAME)) {
+        html = html.replace('</head>', cssTag);
+        htmlChanged = true;
+      }
+      if (!html.includes(INJECTED_JS_FILENAME)) {
+        html = html.replace('</html>', jsTag);
+        htmlChanged = true;
+      }
+
+      const cspResult = patchCspTrustedTypes(html);
+      if (cspResult.changed) {
+        html = cspResult.html;
+        htmlChanged = true;
+        messages.push('Configured Trusted Types policy whitelist in CSP');
+      }
     }
 
     if (htmlChanged) {
@@ -231,23 +300,42 @@ export async function injectRtl(
       }
 
       let secHtml = await fs.readFile(installation.secondaryHtmlPath, 'utf-8');
-      secHtml = secHtml.replace(
-        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
-        ''
-      );
-      secHtml = secHtml.replace(
-        /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
-        ''
-      );
-
+      const secAlreadyHasTags = secHtml.includes(INJECTED_CSS_FILENAME) && secHtml.includes(INJECTED_JS_FILENAME);
       let secChanged = false;
-      if (!secHtml.includes(INJECTED_CSS_FILENAME)) {
-        secHtml = secHtml.replace('</head>', cssTag);
-        secChanged = true;
-      }
-      if (!secHtml.includes(INJECTED_JS_FILENAME)) {
-        secHtml = secHtml.replace('</html>', jsTag);
-        secChanged = true;
+
+      if (secAlreadyHasTags) {
+        const secCspRes = patchCspTrustedTypes(secHtml);
+        if (secCspRes.changed) {
+          secHtml = secCspRes.html;
+          secChanged = true;
+        }
+      } else {
+        secHtml = secHtml.replace(
+          /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
+          ''
+        );
+        secHtml = secHtml.replace(
+          /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<script[^>]+><\/script>/gi,
+          ''
+        );
+
+        const cssTag = `\t<!-- RightFlow -->\n\t<link rel="stylesheet" href="../../../workbench/${INJECTED_CSS_FILENAME}">\n</head>`;
+        const jsTag = `\t<!-- RightFlow -->\n\t<script src="../../../workbench/${INJECTED_JS_FILENAME}"></script>\n</html>`;
+
+        if (!secHtml.includes(INJECTED_CSS_FILENAME)) {
+          secHtml = secHtml.replace('</head>', cssTag);
+          secChanged = true;
+        }
+        if (!secHtml.includes(INJECTED_JS_FILENAME)) {
+          secHtml = secHtml.replace('</html>', jsTag);
+          secChanged = true;
+        }
+
+        const secCspResult = patchCspTrustedTypes(secHtml);
+        if (secCspResult.changed) {
+          secHtml = secCspResult.html;
+          secChanged = true;
+        }
       }
 
       if (secChanged) {
@@ -351,7 +439,7 @@ export async function removeRtl(
       changed = true;
     }
     let html = await fs.readFile(installation.workbenchHtmlPath, 'utf-8');
-    const cleanedHtml = html
+    let cleanedHtml = html
       .replace(
         /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
         ''
@@ -362,6 +450,10 @@ export async function removeRtl(
       )
       .replace(/\s*<link rel="stylesheet"[^>]*rightflow\.css[^>]*>/gi, '')
       .replace(/\s*<script[^>]*rightflow\.js[^>]*><\/script>/gi, '');
+    const unpatchCsp = unpatchCspTrustedTypes(cleanedHtml);
+    if (unpatchCsp.changed) {
+      cleanedHtml = unpatchCsp.html;
+    }
     if (cleanedHtml !== html) {
       await fs.writeFile(installation.workbenchHtmlPath, cleanedHtml, 'utf-8');
       changed = true;
@@ -376,7 +468,7 @@ export async function removeRtl(
         changed = true;
       }
       let secHtml = await fs.readFile(installation.secondaryHtmlPath, 'utf-8');
-      const cleanedSec = secHtml
+      let cleanedSec = secHtml
         .replace(
           /\s*<!--\s*(?:Antigravity (?:Chat )?RTL(?: Pro)?|RightFlow)[^-]*-->\s*<link rel="stylesheet"[^>]+>/gi,
           ''
@@ -387,6 +479,10 @@ export async function removeRtl(
         )
         .replace(/\s*<link rel="stylesheet"[^>]*rightflow\.css[^>]*>/gi, '')
         .replace(/\s*<script[^>]*rightflow\.js[^>]*><\/script>/gi, '');
+      const unpatchSecCsp = unpatchCspTrustedTypes(cleanedSec);
+      if (unpatchSecCsp.changed) {
+        cleanedSec = unpatchSecCsp.html;
+      }
       if (cleanedSec !== secHtml) {
         await fs.writeFile(installation.secondaryHtmlPath, cleanedSec, 'utf-8');
         changed = true;
