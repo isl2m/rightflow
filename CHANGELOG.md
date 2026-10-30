@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.26] - 2026-10-30
+
+### Fixed
+- **Antigravity Chat Header Toggle Button:** Fixed DOM docking anchor by adding support for `[data-testid="titlebar-more-actions"]` and `[data-testid="pane-titlebar-toolbar"]`, allowing the RTL toggle button to seamlessly appear beside conversation tools in Antigravity IDE.
+- **Electron Title Bar Interaction:** Added `-webkit-app-region: no-drag` and `pointer-events: auto` to ensure reliable clicking in Electron drag regions.
+- **Instant Body Class Initialization:** Decoupled `rightflow-enabled` body class assignment from header toolbar insertion so RTL styling takes effect immediately on launch regardless of header render timing.
+- **Enhanced Chat Message & Bubble BiDi:** Added comprehensive selectors for Antigravity's user message bubbles (`[data-testid="user-message-bubble"]`, `[data-quotable="true"]`), agent responses (`CustomMarkdown`), and titlebar breadcrumbs (`header span`).
+
+---
+
 ## [1.0.25] - 2026-10-30
 
 ### Fixed

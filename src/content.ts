@@ -288,12 +288,12 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
 #rightflow-toggle-btn,
 #antigravity-rtl-toggle-btn,
 .rightflow-chat-toggle-btn {
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    min-height: 26px !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
     padding: 0 !important;
-    margin: 0 2px !important;
+    margin: 0 1px !important;
     border-radius: 6px !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -302,16 +302,20 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
     user-select: none !important;
     background: transparent !important;
     color: var(--vscode-icon-foreground, #cccccc) !important;
-    opacity: 0.75 !important;
+    opacity: 0.8 !important;
     transition: all 0.15s ease !important;
     box-shadow: none !important;
     text-decoration: none !important;
+    -webkit-app-region: no-drag !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 #rightflow-toggle-btn:hover,
 #antigravity-rtl-toggle-btn:hover {
     opacity: 1 !important;
     background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--vscode-foreground, #ffffff) !important;
 }
 
 #rightflow-toggle-btn.rightflow-active,
@@ -319,13 +323,13 @@ body.antigravity-force-editor-rtl .monaco-editor .view-lines .view-line span.mtk
 #antigravity-rtl-toggle-btn.antigravity-rtl-active {
     opacity: 1 !important;
     color: #38bdf8 !important;
-    background: rgba(56, 189, 248, 0.14) !important;
+    background: rgba(56, 189, 248, 0.16) !important;
 }
 
 #rightflow-toggle-btn svg,
 #antigravity-rtl-toggle-btn svg {
-    width: 15px !important;
-    height: 15px !important;
+    width: 16px !important;
+    height: 16px !important;
     pointer-events: none !important;
 }
 
@@ -448,9 +452,12 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
     }
 
     // Immediately restore saved chat state on startup
-    var savedState = localStorage.getItem(STORAGE_KEY);
+    var savedState = null;
+    try {
+        savedState = localStorage.getItem(STORAGE_KEY);
+    } catch(e) {}
     var isGloballyActive = (savedState === null || savedState === 'true');
-    if (isGloballyActive) {
+    if (isGloballyActive && document.body) {
         document.body.classList.add(BODY_CLASS);
     }
 
@@ -515,6 +522,13 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             // 2. Antigravity IDE - Agent Chat & Conversation Panel (#conversation, [role="article"], [data-testid="conversation-view"])
             '[data-testid="conversation-view"] .whitespace-pre-wrap',
             '[data-testid="conversation-view"] .leading-relaxed',
+            '[data-testid="conversation-view"] .leading-relaxed p',
+            '[data-testid="conversation-view"] .leading-relaxed li',
+            '[data-testid="conversation-view"] .leading-relaxed blockquote',
+            '[data-testid="conversation-view"] .leading-relaxed table',
+            '[data-testid="conversation-view"] .leading-relaxed th',
+            '[data-testid="conversation-view"] .leading-relaxed td',
+            '[data-testid="conversation-view"] .leading-relaxed h1, [data-testid="conversation-view"] .leading-relaxed h2, [data-testid="conversation-view"] .leading-relaxed h3, [data-testid="conversation-view"] .leading-relaxed h4, [data-testid="conversation-view"] .leading-relaxed h5, [data-testid="conversation-view"] .leading-relaxed h6',
             '[data-testid="conversation-view"] .select-text p',
             '[data-testid="conversation-view"] .select-text li',
             '[data-testid="conversation-view"] .select-text ul',
@@ -527,7 +541,18 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
             '[data-testid="conversation-view"] p',
             '[data-testid="conversation-view"] li',
             '[data-testid="conversation-view"] table',
+            '[data-testid="conversation-view"] td',
+            '[data-testid="conversation-view"] th',
             '[data-testid="conversation-view"] blockquote',
+            '[data-testid="user-message-bubble"]',
+            '[data-testid="user-message-bubble"] .whitespace-pre-wrap',
+            '[data-testid="user-message-bubble"] [data-quotable="true"]',
+            '[data-quotable="true"]',
+            '[data-quotable="true"] span',
+            'header span, .@container\\/titlebar span',
+            '[data-testid="titlebar-service-announcement-slot"] span',
+            'button[data-testid="sidebar-search-button"] ~ span',
+            '.select-none.items-center.justify-between span',
             '[data-turn-content] p',
             '[data-turn-content] li',
             '[data-turn-content] .whitespace-pre-wrap',
@@ -696,7 +721,7 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
      */
     function updateInputBoxes() {
         try {
-            var inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"], [data-lexical-editor="true"]');
+            var inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"], [data-lexical-editor="true"], [data-testid="agent-input-box"] [contenteditable="true"]');
             inputs.forEach(function(input) {
                 if (input._hasRtlListener) return;
                 input._hasRtlListener = true;
@@ -766,14 +791,29 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
      */
     function tryInsertChatButton() {
         var existingBtn = document.getElementById(BTN_ID);
-        if (existingBtn && existingBtn.isConnected && existingBtn.parentElement) return;
+        if (existingBtn && existingBtn.isConnected && existingBtn.parentElement) {
+            var isAct = document.body.classList.contains(BODY_CLASS);
+            existingBtn.classList.toggle('rightflow-active', isAct);
+            existingBtn.classList.toggle('antigravity-rtl-active', isAct);
+            return;
+        }
         if (existingBtn && (!existingBtn.isConnected || !existingBtn.parentElement)) {
             try { existingBtn.remove(); } catch(e) {}
         }
 
-        // 1. Antigravity IDE new conversation / chat header buttons
-        var anchor = document.querySelector('[data-testid="extension-new-conversation"]') ||
+        // 1. Antigravity IDE titlebar action toolbar & buttons
+        var antMoreActions = document.querySelector('[data-testid="titlebar-more-actions"]') ||
+                             document.querySelector('button[data-testid="titlebar-more-actions"]');
+        var antToolbar = document.querySelector('[data-testid="pane-titlebar-toolbar"] .flex.items-center.gap-1') ||
+                         document.querySelector('[data-testid="pane-titlebar-toolbar"]') ||
+                         document.querySelector('.@container\\/titlebar [data-testid="pane-titlebar-toolbar"]');
+
+        var anchor = antMoreActions ||
+                     document.querySelector('[data-testid="pane-titlebar-toolbar"] button') ||
+                     document.querySelector('[data-testid="extension-new-conversation"]') ||
                      document.querySelector('[data-testid="app-icon-new-conversation-button"]') ||
+                     document.querySelector('[data-testid="aux-pane-new-tab-button"]') ||
+                     document.querySelector('[data-testid="aux-panel-plus-dropdown-trigger"]') ||
                      document.querySelector('[aria-label="New Conversation"]') ||
                      document.querySelector('[data-testid="extension-open-in-hub"]') ||
                      document.querySelector('[data-tooltip-id="new-conversation-tooltip"]') ||
@@ -789,34 +829,41 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         if (anchor && anchor.parentElement) {
             container = anchor.parentElement;
             insertBeforeNode = anchor;
+        } else if (antToolbar) {
+            container = antToolbar;
+            insertBeforeNode = antToolbar.firstChild;
         } else {
-            var antActionGroup = document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-2.px-0\.5') ||
-                                 document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-2');
+            var antActionGroup = document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-1') ||
+                                 document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-2.px-0\\.5') ||
+                                 document.querySelector('.flex.items-center.justify-between .flex.items-center.gap-2') ||
+                                 document.querySelector('.flex.items-center.justify-between .flex.items-center') ||
+                                 document.querySelector('[data-testid="pane-titlebar-toolbar"]');
             if (antActionGroup) {
                 container = antActionGroup;
                 insertBeforeNode = antActionGroup.firstChild;
             } else {
-            // 2. Cursor IDE chat toolbar
-            var cursorToolbar = document.querySelector('.aichat-container .chat-actions') ||
-                                document.querySelector('.composer-header .actions') ||
-                                document.querySelector('.aichat-header');
-            if (cursorToolbar) {
-                container = cursorToolbar;
-                insertBeforeNode = cursorToolbar.firstChild;
-            } else {
-                // 3. VS Code Copilot Chat title actions
-                var copilotToolbar = document.querySelector('.interactive-session .title-actions .actions-container') ||
-                                     document.querySelector('.chat-widget .title-actions .actions-container');
-                if (copilotToolbar) {
-                    container = copilotToolbar;
-                    insertBeforeNode = copilotToolbar.firstChild;
+                // 2. Cursor IDE chat toolbar
+                var cursorToolbar = document.querySelector('.aichat-container .chat-actions') ||
+                                    document.querySelector('.composer-header .actions') ||
+                                    document.querySelector('.aichat-header');
+                if (cursorToolbar) {
+                    container = cursorToolbar;
+                    insertBeforeNode = cursorToolbar.firstChild;
                 } else {
-                    // 4. Windsurf Cascade toolbar
-                    var cascadeToolbar = document.querySelector('.cascade-header .actions') ||
-                                         document.querySelector('.cascade-toolbar');
-                    if (cascadeToolbar) {
-                        container = cascadeToolbar;
-                        insertBeforeNode = cascadeToolbar.firstChild;
+                    // 3. VS Code Copilot Chat title actions
+                    var copilotToolbar = document.querySelector('.interactive-session .title-actions .actions-container') ||
+                                         document.querySelector('.chat-widget .title-actions .actions-container');
+                    if (copilotToolbar) {
+                        container = copilotToolbar;
+                        insertBeforeNode = copilotToolbar.firstChild;
+                    } else {
+                        // 4. Windsurf Cascade toolbar
+                        var cascadeToolbar = document.querySelector('.cascade-header .actions') ||
+                                             document.querySelector('.cascade-toolbar');
+                        if (cascadeToolbar) {
+                            container = cascadeToolbar;
+                            insertBeforeNode = cascadeToolbar.firstChild;
+                        }
                     }
                 }
             }
@@ -829,10 +876,15 @@ export const INJECTED_JS = `/* === RIGHTFLOW-JS-START === */
         btn.setAttribute('href', '#');
         btn.setAttribute('role', 'button');
         btn.setAttribute('tabindex', '0');
+        btn.setAttribute('data-testid', 'rightflow-chat-toggle-btn');
+        btn.style.webkitAppRegion = 'no-drag';
         btn.title = 'RightFlow: \u062a\u0628\u062f\u064a\u0644 \u0627\u062a\u062c\u0627\u0647 \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 (RTL / LTR)';
         btn.appendChild(createRtlIconSvg());
 
-        var saved = localStorage.getItem(STORAGE_KEY);
+        var saved = null;
+        try {
+            saved = localStorage.getItem(STORAGE_KEY);
+        } catch(e) {}
         var isCurrentlyActive = (saved === null || saved === 'true');
 
         if (isCurrentlyActive) {
